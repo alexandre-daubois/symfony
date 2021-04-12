@@ -268,6 +268,10 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             return;
         }
 
+        if ('callable' === $type && \is_object($value) && ($value instanceof Reference || $value instanceof Definition)) {
+            return;
+        }
+
         if ('iterable' === $type && (\is_array($value) || 'array' === $class || is_subclass_of($class, \Traversable::class))) {
             return;
         }
