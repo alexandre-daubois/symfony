@@ -32,7 +32,7 @@
         "symfony/translation-implementation": "2.3"
     },
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0",
         "ext-xml": "*",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
         "doctrine/event-manager": "~1.0",

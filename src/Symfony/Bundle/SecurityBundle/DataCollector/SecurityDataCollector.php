@@ -24,6 +24,9 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticatorManagerInterface;
+use Symfony\Component\Security\Http\Authentication\TraceableAuthenticatorManager;
+use Symfony\Component\Security\Http\EventListener\LateCheckPassportEventListener;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
@@ -44,9 +47,10 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     private $firewallMap;
     private $firewall;
     private $hasVarDumper;
-    private $authenticatorManagerEnabled;
+    private $authenticatorManager;
+    private $lateCheckPassportEventListener;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, bool $authenticatorManagerEnabled = false)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, AuthenticatorManagerInterface $authenticatorManager = null, LateCheckPassportEventListener $lateCheckPassportEventListener = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
@@ -55,7 +59,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         $this->firewallMap = $firewallMap;
         $this->firewall = $firewall;
         $this->hasVarDumper = class_exists(ClassStub::class);
-        $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
+        $this->authenticatorManager = $authenticatorManager;
+        $this->lateCheckPassportEventListener = $lateCheckPassportEventListener;
     }
 
     /**
@@ -173,6 +178,29 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $this->data['voters'] = [];
         }
 
+        // collect authenticators infirmation
+        $this->data['authenticators'] = [];
+        $this->data['badges'] = [];
+        if ($this->authenticatorManager instanceof TraceableAuthenticatorManager) {
+            $authenticatorLog = $this->authenticatorManager->getAuthenticatorsLog();
+            foreach ($authenticatorLog as $log) {
+                $authenticatorClass = \get_class($log['authenticator']);
+                $classData = $this->hasVarDumper ? new ClassStub($authenticatorClass) : $authenticatorClass;
+                $currentLog = [
+                    'class' => $classData,
+                    'supports' => $log['supports'],
+                    'response' => $log['response'],
+                ];
+
+                $this->data['authenticators'][] = $currentLog;
+            }
+        }
+
+        // collect badges information
+        if (null !== $this->lateCheckPassportEventListener) {
+            $this->data['badges'] = $this->lateCheckPassportEventListener->getBadges();
+        }
+
         // collect firewall context information
         $this->data['firewall'] = null;
         if ($this->firewallMap instanceof FirewallMap) {
@@ -210,7 +238,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $this->data['listeners'] = $this->firewall->getWrappedListeners();
         }
 
-        $this->data['authenticator_manager_enabled'] = $this->authenticatorManagerEnabled;
+        $this->data['authenticator_manager_enabled'] = null !== $this->authenticatorManager;
     }
 
     /**
@@ -359,6 +387,26 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function getVoterStrategy()
     {
         return $this->data['voter_strategy'];
+    }
+
+    /**
+     * Returns the FQCN of authenticators enabled in the application.
+     *
+     * @return string[]|Data
+     */
+    public function getAuthenticators()
+    {
+        return $this->data['authenticators'];
+    }
+
+    /**
+     * Returns the FQCN of badges used in the application.
+     *
+     * @return string[]|Data
+     */
+    public function getBadges()
+    {
+        return $this->data['badges'];
     }
 
     /**

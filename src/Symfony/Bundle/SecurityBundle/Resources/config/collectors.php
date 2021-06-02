@@ -23,6 +23,8 @@ return static function (ContainerConfigurator $container) {
                 service('security.access.decision_manager'),
                 service('security.firewall.map'),
                 service('debug.security.firewall')->nullOnInvalid(),
+                service('debug.security.authenticator.manager'),
+                service('debug.security.listener.late_check_passport_event'),
             ])
             ->tag('data_collector', [
                 'template' => '@Security/Collector/security.html.twig',

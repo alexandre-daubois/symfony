@@ -371,4 +371,54 @@
             </tbody>
         </table>
     {% endif %}
+
+    {% if collector.authenticators|default([]) is not empty %}
+        <h2>Authenticators <small>({{ collector.authenticators|length }})</small></h2>
+
+        <table class="authenticators">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Authenticator class</th>
+                <th>Supports request</th>
+                <th>Response</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for authenticator in collector.authenticators %}
+                <tr>
+                    <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                    <td class="font-normal">{{ profiler_dump(authenticator.class) }}</td>
+                    <td class="font-normal"><span class="value">{{ include('@WebProfiler/Icon/' ~ (authenticator.supports ? 'yes' : 'no') ~ '.svg') }}</span></td>
+                    <td class="font-normal">{{ authenticator.response is null ? '&mdash;' : profiler_dump(authenticator.response) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if collector.badges|default([]) is not empty %}
+            <h2>Badges <small>({{ collector.badges|length }})</small></h2>
+
+            <table class="authenticators">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Badge</th>
+                    <th>Resolved</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for badge in collector.badges %}
+                    <tr>
+                        <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                        <td class="font-normal">{{ profiler_dump(badge.badge) }}</td>
+                        <td class="font-normal"><span class="value">{{ include('@WebProfiler/Icon/' ~ (badge.resolved ? 'yes' : 'no') ~ '.svg') }}</span></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% endif %}
 {% endblock %}
