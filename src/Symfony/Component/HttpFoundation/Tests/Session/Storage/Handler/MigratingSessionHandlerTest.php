@@ -75,7 +75,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->currentHandler->expects($this->once())
             ->method('gc')
             ->with($maxlifetime)
-            ->willReturn(true);
+            ->willReturn(1);
 
         $this->writeOnlyHandler->expects($this->once())
             ->method('gc')
