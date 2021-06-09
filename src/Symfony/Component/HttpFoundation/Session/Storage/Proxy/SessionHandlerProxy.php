@@ -81,7 +81,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * @return int|false
+     * @return int|bool
      */
     #[\ReturnTypeWillChange]
     public function gc($maxlifetime)
