@@ -19,6 +19,7 @@ use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
  *
  * @internal
  */
+#[\AllowDynamicProperties]
 class Registry
 {
     public static $reflectors = [];

@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\AllowDynamicProperties]
 abstract class Constraint
 {
     /**

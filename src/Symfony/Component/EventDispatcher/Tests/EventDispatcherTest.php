@@ -456,6 +456,7 @@ class CallableClass
     }
 }
 
+#[\AllowDynamicProperties]
 class TestEventListener
 {
     public $preFooInvoked = false;

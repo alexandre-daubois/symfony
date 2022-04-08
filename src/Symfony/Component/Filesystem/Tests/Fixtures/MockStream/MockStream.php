@@ -15,6 +15,7 @@ namespace Symfony\Component\Filesystem\Tests\Fixtures\MockStream;
  * Mock stream class to be used with stream_wrapper_register.
  * stream_wrapper_register('mock', 'Symfony\Component\Filesystem\Tests\Fixtures\MockStream\MockStream').
  */
+#[\AllowDynamicProperties]
 class MockStream
 {
     /**

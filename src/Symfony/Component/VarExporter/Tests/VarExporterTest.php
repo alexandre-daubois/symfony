@@ -313,6 +313,7 @@ class MyArrayObject extends \ArrayObject
     }
 }
 
+#[\AllowDynamicProperties]
 class GoodNight
 {
     public function __sleep(): array
@@ -403,6 +404,7 @@ class FooSerializable implements \Serializable
     }
 }
 
+#[\AllowDynamicProperties]
 class Php74Serializable implements \Serializable
 {
     public function __serialize(): array

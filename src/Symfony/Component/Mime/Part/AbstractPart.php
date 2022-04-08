@@ -16,6 +16,7 @@ use Symfony\Component\Mime\Header\Headers;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
+#[\AllowDynamicProperties]
 abstract class AbstractPart
 {
     private $headers;
