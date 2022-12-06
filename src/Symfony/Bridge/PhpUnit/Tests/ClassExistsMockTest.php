@@ -92,6 +92,17 @@ class ClassExistsMockTest extends TestCase
         $this->assertFalse(trait_exists('\\NonExistingTraitReal'));
         $this->assertFalse(trait_exists('\\NonExistingTraitReal', false));
     }
+
+    /**
+     * @requires PHP < 8.1
+     */
+    public function testEnumExistsThrowsExceptionOnOlderPHPVersions()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('"enum_exists" cannot be used with a version of PHP earlier than 8.1.');
+
+        enum_exists('ThisDoesntMatter');
+    }
 }
 
 class ExistingClass

@@ -49,6 +49,17 @@ class ClassExistsMock
         return isset(self::$classes[$name]) ? (bool) self::$classes[$name] : \trait_exists($name, $autoload);
     }
 
+    public static function enum_exists($name, $autoload = true)
+    {
+        $name = ltrim($name, '\\');
+
+        if (\PHP_VERSION_ID < 80100) {
+            throw new \LogicException('"enum_exists" cannot be used with a version of PHP earlier than 8.1.');
+        }
+
+        return isset(self::$classes[$name]) ? (bool) self::$classes[$name] : \enum_exists($name, $autoload);
+    }
+
     public static function register($class)
     {
         $self = static::class;
@@ -61,7 +72,7 @@ class ClassExistsMock
             $mockedNs[] = substr($class, 6, strrpos($class, '\\') - 6);
         }
         foreach ($mockedNs as $ns) {
-            foreach (['class', 'interface', 'trait'] as $type) {
+            foreach (['class', 'interface', 'trait', 'enum'] as $type) {
                 if (\function_exists($ns.'\\'.$type.'_exists')) {
                     continue;
                 }
