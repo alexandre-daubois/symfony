@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add caster for `WeakMap`
  * Add support of named arguments to `dd()` and `dump()` to display the argument name
+ * Add support of dumper's behavior configuration with the special `_options` named argument for `dump` and `dd`
 
 6.2
 ---

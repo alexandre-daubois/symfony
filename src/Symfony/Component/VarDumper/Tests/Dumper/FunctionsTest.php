@@ -85,6 +85,20 @@ class FunctionsTest extends TestCase
         $this->assertSame([$var1, 'second' => $var2, 'third' => $var3], $return);
     }
 
+    public function testDumpReturnsAllNamedArgsExceptSpecialOptionsOne()
+    {
+        $this->setupVarDumper();
+
+        $var1 = 'a';
+        $var2 = 'b';
+
+        ob_start();
+        $return = dump($var1, named: $var2, _options: ['options' => true]);
+        ob_end_clean();
+
+        $this->assertSame([$var1, 'named' => $var2], $return);
+    }
+
     protected function setupVarDumper()
     {
         $cloner = new VarCloner();

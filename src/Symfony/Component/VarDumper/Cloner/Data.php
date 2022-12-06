@@ -12,7 +12,9 @@
 namespace Symfony\Component\VarDumper\Cloner;
 
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\BacktraceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
+use Symfony\Component\VarDumper\Dumper\VarDumperOptions;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -268,6 +270,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         $refs = [0];
         $cursor = new Cursor();
         $label = $this->context['label'] ?? '';
+        $options = $this->context['options'] ?? new VarDumperOptions();
 
         if ($cursor->attr = $this->context[SourceContextProvider::class] ?? []) {
             $cursor->attr['if_links'] = true;
@@ -279,6 +282,10 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         }
 
         $this->dumpItem($dumper, $cursor, $refs, $this->data[$this->position][$this->key]);
+
+        if (true === $options->get(VarDumperOptions::TRACE) && $cursor->attr = $this->context[BacktraceContextProvider::class] ?? []) {
+            $this->dumpDebugBacktrace($dumper, $cursor);
+        }
     }
 
     /**
@@ -428,5 +435,27 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         $stub->value = $stub->cut + ($stub->position ? \count($this->data[$stub->position]) : 0);
 
         return $stub;
+    }
+
+    private function dumpDebugBacktrace(DumperInterface $dumper, Cursor $cursor): void
+    {
+        $traces = $cursor->attr;
+        $dumper->dumpScalar($cursor, 'default', '');
+        $dumper->enterHash($cursor, Cursor::HASH_OBJECT, '**DEBUG BACKTRACE**', true);
+
+        foreach ($traces as $trace) {
+            $traceCursor = new Cursor();
+            $traceCursor->attr = $trace;
+
+            $cursor->hashType = -1;
+
+            $traceCursor->attr['if_links'] = true;
+            $dumper->dumpScalar($cursor, 'default', '  ');
+            $dumper->dumpScalar($traceCursor, 'default', \sprintf("%s:%s", $trace['file'], $trace['line']));
+
+            $cursor->hashType = 0;
+        }
+
+        $dumper->leaveHash($cursor, Cursor::HASH_OBJECT, '**DEBUG BACKTRACE**', true, 0);
     }
 }

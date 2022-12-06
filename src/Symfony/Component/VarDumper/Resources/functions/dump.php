@@ -19,18 +19,24 @@ if (!function_exists('dump')) {
      */
     function dump(mixed ...$vars): mixed
     {
+        $options = [];
+        if (array_key_exists('_options', $vars)) {
+            $options = $vars['_options'];
+            unset($vars['_options']);
+        }
+
         if (!$vars) {
-            VarDumper::dump(new ScalarStub('🐛'));
+            VarDumper::dump(new ScalarStub('🐛'), null, $options);
 
             return null;
         }
 
         if (isset($vars[0]) && 1 === count($vars)) {
-            VarDumper::dump($vars[0]);
+            VarDumper::dump($vars[0], null, $options);
             $k = 0;
         } else {
             foreach ($vars as $k => $v) {
-                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+                VarDumper::dump($v, is_int($k) ? 1 + $k : $k, $options);
             }
         }
 
@@ -49,11 +55,17 @@ if (!function_exists('dd')) {
             header('HTTP/1.1 500 Internal Server Error');
         }
 
+        $options = [];
+        if (array_key_exists('_options', $vars)) {
+            $options = $vars['_options'];
+            unset($vars['_options']);
+        }
+
         if (isset($vars[0]) && 1 === count($vars)) {
-            VarDumper::dump($vars[0]);
+            VarDumper::dump($vars[0], null, $options);
         } else {
             foreach ($vars as $k => $v) {
-                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+                VarDumper::dump($v, is_int($k) ? 1 + $k : $k, $options);
             }
         }
 

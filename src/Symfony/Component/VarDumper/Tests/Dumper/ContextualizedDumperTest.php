@@ -14,11 +14,14 @@ namespace Symfony\Component\VarDumper\Tests\Dumper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\BacktraceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextualizedDumper;
+use Symfony\Component\VarDumper\Dumper\VarDumperOptions;
 
 /**
  * @author Kévin Thérage <therage.kevin@gmail.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 class ContextualizedDumperTest extends TestCase
 {
@@ -39,5 +42,25 @@ class ContextualizedDumperTest extends TestCase
 
         $this->assertStringContainsString("\e]8;;{$href}\e\\\e[", $out);
         $this->assertStringContainsString("m{$var}\e[", $out);
+    }
+
+    public function testEnablingBacktraceDisplaysIt()
+    {
+        $wrappedDumper = new CliDumper('php://output');
+        $dumper = new ContextualizedDumper($wrappedDumper, [new SourceContextProvider(), new BacktraceContextProvider()]);
+        $cloner = new VarCloner();
+
+        $options = new VarDumperOptions();
+        $options->trace();
+
+        ob_start();
+        $dumper->dump(
+            $cloner->cloneVar(123)->withContext([
+                'options' => $options
+            ])
+        );
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('**DEBUG BACKTRACE**', $result);
     }
 }
