@@ -26,7 +26,7 @@ class FunctionsTest extends TestCase
         $return = dump();
         ob_end_clean();
 
-        $this->assertNull($return);
+        $this->assertSame([], $return);
     }
 
     public function testDumpReturnsFirstArg()
@@ -83,6 +83,20 @@ class FunctionsTest extends TestCase
         ob_end_clean();
 
         $this->assertSame([$var1, 'second' => $var2, 'third' => $var3], $return);
+    }
+
+    public function testDumpReturnsAllNamedArgsExceptSpecialOptionOnes()
+    {
+        $this->setupVarDumper();
+
+        $var1 = 'a';
+        $var2 = 'b';
+
+        ob_start();
+        $return = dump($var1, named: $var2, _trace: true, _flags: 0);
+        ob_end_clean();
+
+        $this->assertSame([$var1, 'named' => $var2], $return);
     }
 
     protected function setupVarDumper()

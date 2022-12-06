@@ -340,52 +340,36 @@ EOTXT;
         $clone = $cloner->cloneVar($data);
 
         $expected = <<<'EOTXT'
-object(Symfony\Component\VarDumper\Cloner\Data)#%d (7) {
-  ["data":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+%AVarClonerTest.php:%i:
+class Symfony\Component\VarDumper\Cloner\Data#%i (%i) {
+  private array $data =>
   array(2) {
-    [0]=>
+    [0] =>
     array(1) {
-      [0]=>
+      [0] =>
       array(1) {
-        [1]=>
-        int(1)
+        ...
       }
     }
-    [1]=>
+    [1] =>
     array(1) {
-      ["1"]=>
-      object(Symfony\Component\VarDumper\Cloner\Stub)#%i (8) {
-        ["type"]=>
-        int(4)
-        ["class"]=>
-        string(8) "stdClass"
-        ["value"]=>
-        NULL
-        ["cut"]=>
-        int(0)
-        ["handle"]=>
-        int(%i)
-        ["refCount"]=>
-        int(0)
-        ["position"]=>
-        int(0)
-        ["attr"]=>
-        array(0) {
-        }
+      [1] =>
+      class Symfony\Component\VarDumper\Cloner\Stub#%i (%i) {
+        ...
       }
     }
   }
-  ["position":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  private int $position =>
   int(0)
-  ["key":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  private string|int $key =>
   int(0)
-  ["maxDepth":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  private int $maxDepth =>
   int(20)
-  ["maxItemsPerDepth":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  private int $maxItemsPerDepth =>
   int(-1)
-  ["useRefHandles":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  private int $useRefHandles =>
   int(-1)
-  ["context":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  private array $context =>
   array(0) {
   }
 }
@@ -393,7 +377,7 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%d (7) {
 EOTXT;
         ob_start();
         var_dump($clone);
-        $this->assertStringMatchesFormat(str_replace('"1"', '1', $expected), ob_get_clean());
+        $this->assertStringMatchesFormat($expected, ob_get_clean());
     }
 
     public function testCaster()
