@@ -14,6 +14,8 @@ namespace Symfony\Component\VarDumper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -121,15 +123,33 @@ class VarDumper
             ]);
         }
 
-        self::$handler = function ($var, string $label = null) use ($cloner, $dumper, $options) {
-            $var = self::cloneVarWithOptions($cloner, $var, $options);
+        $paths = $options->get(VarDumperOptions::PATH);
+        if (!interface_exists(PropertyAccessorInterface::class) && null !== $paths) {
+            throw new \LogicException('You cannot use the "_path" option if the PropertyAccess component is not available. Try running "composer require symfony/property-access".');
+        }
 
-            if (null !== $label) {
-                $var = $var->withContext(['label' => $label]);
+        self::$handler = function ($var, string $label = null) use ($cloner, $dumper, $options, $paths) {
+            $dumpedVar = $var;
+            if (\is_array($paths)) {
+                $accessor = new PropertyAccessor();
+                $dumpedVar = [];
+                $paths = array_unique($paths);
+
+                foreach ($paths as $path) {
+                    if (null !== $path) {
+                        $dumpedVar[$path] = $accessor->getValue($var, $path);
+                    }
+                }
             }
 
-            $var = $var->withContext($var->getContext() + ['options' => $options]);
-            $dumper->dump($var);
+            $dumpedVar = self::cloneVarWithOptions($cloner, $dumpedVar, $options);
+
+            if (null !== $label) {
+                $dumpedVar = $dumpedVar->withContext(['label' => $label]);
+            }
+
+            $dumpedVar = $dumpedVar->withContext($dumpedVar->getContext() + ['options' => $options]);
+            $dumper->dump($dumpedVar);
         };
     }
 

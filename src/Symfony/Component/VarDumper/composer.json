@@ -33,7 +33,8 @@
     "suggest": {
         "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used).",
         "ext-intl": "To show region name in time zone dump",
-        "symfony/console": "To use the ServerDumpCommand and/or the bin/var-dump-server script"
+        "symfony/console": "To use the ServerDumpCommand and/or the bin/var-dump-server script",
+        "symfony/property-access": "To partially display a variable content with a property path"
     },
     "autoload": {
         "files": [ "Resources/functions/dump.php" ],

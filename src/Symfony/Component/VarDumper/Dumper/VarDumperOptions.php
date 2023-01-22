@@ -28,6 +28,7 @@ class VarDumperOptions
     public const THEME = '_theme';
     public const FLAGS = '_flags';
     public const CHARSET = '_charset';
+    public const PATH = '_path';
 
     public const AVAILABLE_OPTIONS = [
         self::FORMAT,
@@ -40,6 +41,7 @@ class VarDumperOptions
         self::THEME,
         self::FLAGS,
         self::CHARSET,
+        self::PATH,
     ];
 
     private array $options;
@@ -183,6 +185,13 @@ class VarDumperOptions
     public function charset(string $charset): static
     {
         $this->options[self::CHARSET] = $charset;
+
+        return $this;
+    }
+
+    public function path(array|string $path): static
+    {
+        $this->options[self::PATH] = (array) $path;
 
         return $this;
     }
