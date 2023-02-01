@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
+use Symfony\Component\VarDumper\Attribute\SensitiveElement;
+use Symfony\Component\VarDumper\Caster\SensitiveElementStub;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -127,6 +130,14 @@ class VarCloner extends AbstractCloner
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_OBJECT;
                             $stub->class = $v::class;
+
+                            $r = new \ReflectionClass($stub->class);
+                            if ($r->getAttributes(SensitiveElement::class)) {
+                                $stub = new SensitiveElementStub($stub->class);
+
+                                break;
+                            }
+
                             $stub->value = $v;
                             $stub->handle = $h;
                             $a = $this->castObject($stub, 0 < $i);

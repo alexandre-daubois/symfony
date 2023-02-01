@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
+use Symfony\Component\VarDumper\Attribute\SensitiveElement;
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\SensitiveElementStub;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
+use Symfony\Component\VarDumper\Tests\Fixtures\SensitiveClass;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
+use Symfony\Component\VarDumper\Attribute\SensitiveElement;
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\SensitiveElementStub;
 use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 
 /**
@@ -346,6 +348,19 @@ abstract class AbstractCloner implements ClonerInterface
 
         $stub->attr += $fileInfo;
         $a = Caster::castObject($obj, $class, $hasDebugInfo, $stub->class);
+
+        foreach ($a as $k => $v) {
+            if (false !== $prop = strrchr($k, "\0")) {
+                $prop = substr($prop, 1);
+
+                if (property_exists($class, $prop)) {
+                    $r = new \ReflectionProperty($class, $prop);
+                    if ($r->getAttributes(SensitiveElement::class)) {
+                        $a[$k] = new SensitiveElementStub('~');
+                    }
+                }
+            }
+        }
 
         try {
             while ($i--) {

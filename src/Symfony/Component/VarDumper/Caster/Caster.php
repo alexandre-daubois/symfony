@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Symfony\Component\VarDumper\Attribute\SensitiveElement;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
