@@ -26,7 +26,7 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
         return new Negative();
     }
 
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [-1, 0],
@@ -36,7 +36,7 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
         ];
     }
 
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [0, '0', 0, '0', 'int'],

@@ -18,6 +18,7 @@ use Symfony\Component\Semaphore\Store\StoreFactory;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 class StoreFactoryTest extends TestCase
 {
@@ -31,12 +32,21 @@ class StoreFactoryTest extends TestCase
         $this->assertInstanceOf($expectedStoreClass, $store);
     }
 
-    public function validConnections()
+    public function testCreateRedisStoreWithObject()
     {
-        if (class_exists(\Redis::class)) {
-            yield [$this->createMock(\Redis::class), RedisStore::class];
+        if (!class_exists(\Redis::class)) {
+            $this->markTestSkipped();
         }
+
+        $store = StoreFactory::createStore($this->createMock(\Redis::class));
+
+        $this->assertInstanceOf(RedisStore::class, $store);
+    }
+
+    public static function validConnections(): \Generator
+    {
         yield [new \Predis\Client(), RedisStore::class];
+
         if (class_exists(\Redis::class) && class_exists(AbstractAdapter::class)) {
             yield ['redis://localhost', RedisStore::class];
         }

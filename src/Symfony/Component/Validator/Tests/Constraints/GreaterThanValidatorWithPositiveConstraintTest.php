@@ -26,7 +26,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
         return new Positive();
     }
 
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [2, 0],
@@ -36,7 +36,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
         ];
     }
 
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [0, '0', 0, '0', 'int'],
