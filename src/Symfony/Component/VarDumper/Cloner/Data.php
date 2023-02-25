@@ -12,6 +12,8 @@
 namespace Symfony\Component\VarDumper\Cloner;
 
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\JsonStub;
+use Symfony\Component\VarDumper\Caster\ScalarStub;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 
 /**
@@ -344,7 +346,12 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
             }
             switch ($item->type) {
                 case Stub::TYPE_STRING:
-                    $dumper->dumpString($cursor, $item->value, Stub::STRING_BINARY === $item->class, $cut);
+                    if ($item instanceof JsonStub) {
+                        $dumper->dumpScalar($cursor, 'default', $item->value);
+                        $dumper->dumpScalar($cursor, '', $item->formatted);
+                    } else {
+                        $dumper->dumpString($cursor, $item->value, Stub::STRING_BINARY === $item->class, $cut);
+                    }
                     break;
 
                 case Stub::TYPE_ARRAY:

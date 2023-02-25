@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
+use Symfony\Component\VarDumper\Caster\JsonStub;
+use Symfony\Component\VarDumper\Caster\StubCaster;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -90,7 +93,14 @@ class VarCloner extends AbstractCloner
                         if ('' === $v) {
                             continue 2;
                         }
-                        if (!preg_match('//u', $v)) {
+
+                        \json_decode($v);
+                        if (\JSON_ERROR_NONE === \json_last_error()) {
+                            $stub = new JsonStub($v, true);
+                            $stub->type = Stub::TYPE_STRING;
+
+                            break;
+                        }if (!preg_match('//u', $v)) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_STRING;
                             $stub->class = Stub::STRING_BINARY;
@@ -109,6 +119,9 @@ class VarCloner extends AbstractCloner
                         } else {
                             continue 2;
                         }
+
+
+
                         $a = null;
                         break;
 
