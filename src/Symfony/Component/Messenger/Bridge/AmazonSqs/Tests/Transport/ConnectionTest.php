@@ -212,26 +212,15 @@ class ConnectionTest extends TestCase
             ->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
         $client->expects($this->exactly(2))
             ->method('receiveMessage')
-            ->withConsecutive(
-                [
-                    [
-                        'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
-                        'MaxNumberOfMessages' => 9,
-                        'WaitTimeSeconds' => 20,
-                        'MessageAttributeNames' => ['All'],
-                        'VisibilityTimeout' => null,
-                    ],
-                ],
-                [
-                    [
-                        'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
-                        'MaxNumberOfMessages' => 9,
-                        'WaitTimeSeconds' => 20,
-                        'MessageAttributeNames' => ['All'],
-                        'VisibilityTimeout' => null,
-                    ],
-                ]
-            )
+            ->with($this->callback(function (array $config) {
+                return [
+                    'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                    'VisibilityTimeout' => null,
+                    'MaxNumberOfMessages' => 9,
+                    'MessageAttributeNames' => ['All'],
+                    'WaitTimeSeconds' => 20,
+                ] === $config;
+            }))
             ->willReturnOnConsecutiveCalls(
                 ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
                     new Message(['MessageId' => 1, 'Body' => 'this is a test']),

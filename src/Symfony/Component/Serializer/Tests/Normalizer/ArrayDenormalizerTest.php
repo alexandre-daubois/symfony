@@ -41,16 +41,22 @@ class ArrayDenormalizerTest extends TestCase
 
     public function testDenormalize()
     {
+        $firstArray = new ArrayDummy('one', 'two');
+        $secondArray = new ArrayDummy('three', 'four');
+
+        $series = [
+            [[['foo' => 'one', 'bar' => 'two']], $firstArray],
+            [[['foo' => 'three', 'bar' => 'four']], $secondArray],
+        ];
+
         $this->serializer->expects($this->exactly(2))
             ->method('denormalize')
-            ->withConsecutive(
-                [['foo' => 'one', 'bar' => 'two']],
-                [['foo' => 'three', 'bar' => 'four']]
-            )
-            ->willReturnOnConsecutiveCalls(
-                new ArrayDummy('one', 'two'),
-                new ArrayDummy('three', 'four')
-            );
+            ->willReturnCallback(function ($data) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+
+                return $expectedArgs === [$data] ? $return : $this->fail();
+            })
+        ;
 
         $result = $this->denormalizer->denormalize(
             [
@@ -74,18 +80,23 @@ class ArrayDenormalizerTest extends TestCase
      */
     public function testDenormalizeLegacy()
     {
-        $serializer = $this->createMock(Serializer::class);
+        $firstArray = new ArrayDummy('one', 'two');
+        $secondArray = new ArrayDummy('three', 'four');
 
+        $series = [
+            [[['foo' => 'one', 'bar' => 'two']], $firstArray],
+            [[['foo' => 'three', 'bar' => 'four']], $secondArray],
+        ];
+
+        $serializer = $this->createMock(Serializer::class);
         $serializer->expects($this->exactly(2))
             ->method('denormalize')
-            ->withConsecutive(
-                [['foo' => 'one', 'bar' => 'two']],
-                [['foo' => 'three', 'bar' => 'four']]
-            )
-            ->willReturnOnConsecutiveCalls(
-                new ArrayDummy('one', 'two'),
-                new ArrayDummy('three', 'four')
-            );
+            ->willReturnCallback(function ($data) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+
+                return $expectedArgs === [$data] ? $return : $this->fail();
+            })
+        ;
 
         $denormalizer = new ArrayDenormalizer();
 

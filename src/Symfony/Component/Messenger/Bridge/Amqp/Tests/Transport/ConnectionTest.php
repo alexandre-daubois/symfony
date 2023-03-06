@@ -311,15 +311,35 @@ class ConnectionTest extends TestCase
         $amqpExchange->expects($this->once())->method('declareExchange');
         $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue0->expects($this->once())->method('declareQueue');
-        $amqpQueue0->expects($this->exactly(2))->method('bind')->withConsecutive(
-            [self::DEFAULT_EXCHANGE_NAME, 'binding_key0'],
-            [self::DEFAULT_EXCHANGE_NAME, 'binding_key1']
-        );
+        $amqpQueue0->expects($this->exactly(2))->method('bind')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [self::DEFAULT_EXCHANGE_NAME, 'binding_key0', []],
+                    [self::DEFAULT_EXCHANGE_NAME, 'binding_key1', []],
+                ];
+
+                $expectedArgs = array_shift($series);
+
+                if ($expectedArgs !== $args) {
+                    $this->fail();
+                }
+            })
+        ;
         $amqpQueue1->expects($this->once())->method('declareQueue');
-        $amqpQueue1->expects($this->exactly(2))->method('bind')->withConsecutive(
-            [self::DEFAULT_EXCHANGE_NAME, 'binding_key2'],
-            [self::DEFAULT_EXCHANGE_NAME, 'binding_key3']
-        );
+        $amqpQueue1->expects($this->exactly(2))->method('bind')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [self::DEFAULT_EXCHANGE_NAME, 'binding_key2', []],
+                    [self::DEFAULT_EXCHANGE_NAME, 'binding_key3', []],
+                ];
+
+                $expectedArgs = array_shift($series);
+
+                if ($expectedArgs !== $args) {
+                    $this->fail();
+                }
+            })
+        ;
 
         $dsn = 'amqp://localhost?'.
             'exchange[default_publish_routing_key]=routing_key&'.
@@ -349,15 +369,35 @@ class ConnectionTest extends TestCase
         $amqpExchange->expects($this->once())->method('declareExchange');
         $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue0->expects($this->once())->method('declareQueue');
-        $amqpQueue0->expects($this->exactly(2))->method('bind')->withConsecutive(
-            [self::DEFAULT_EXCHANGE_NAME, 'binding_key0'],
-            [self::DEFAULT_EXCHANGE_NAME, 'binding_key1']
-        );
+        $amqpQueue0->expects($this->exactly(2))->method('bind')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [self::DEFAULT_EXCHANGE_NAME, 'binding_key0', []],
+                    [self::DEFAULT_EXCHANGE_NAME, 'binding_key1', []],
+                ];
+
+                $expectedArgs = array_shift($series);
+
+                if ($expectedArgs !== $args) {
+                    $this->fail();
+                }
+            })
+        ;
         $amqpQueue1->expects($this->once())->method('declareQueue');
-        $amqpQueue1->expects($this->exactly(2))->method('bind')->withConsecutive(
-            [self::DEFAULT_EXCHANGE_NAME, 'binding_key2'],
-            [self::DEFAULT_EXCHANGE_NAME, 'binding_key3']
-        );
+        $amqpQueue1->expects($this->exactly(2))->method('bind')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [self::DEFAULT_EXCHANGE_NAME, 'binding_key2', []],
+                    [self::DEFAULT_EXCHANGE_NAME, 'binding_key3', []],
+                ];
+
+                $expectedArgs = array_shift($series);
+
+                if ($expectedArgs !== $args) {
+                    $this->fail();
+                }
+            })
+        ;
 
         $dsn = 'amqps://localhost?'.
             'cacert=/etc/ssl/certs&'.
@@ -387,9 +427,7 @@ class ConnectionTest extends TestCase
         $amqpExchange->expects($this->once())->method('declareExchange');
         $amqpExchange->expects($this->once())->method('publish')->with('body', null, \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue->expects($this->once())->method('declareQueue');
-        $amqpQueue->expects($this->exactly(1))->method('bind')->withConsecutive(
-            [self::DEFAULT_EXCHANGE_NAME, null, ['x-match' => 'all']]
-        );
+        $amqpQueue->expects($this->exactly(1))->method('bind')->with(self::DEFAULT_EXCHANGE_NAME, null, ['x-match' => 'all']);
 
         $dsn = 'amqp://localhost?exchange[type]=headers'.
             '&queues[queue0][binding_arguments][x-match]=all';

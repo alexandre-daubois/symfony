@@ -99,22 +99,29 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     public function testCreatesTableInTransaction(string $platform)
     {
         $conn = $this->createMock(Connection::class);
+
+        $series = [
+            [$this->stringContains('INSERT INTO'), $this->createMock(TableNotFoundException::class)],
+            [$this->matches('create sql stmt'), 1],
+            [$this->stringContains('INSERT INTO'), 1],
+        ];
+
         $conn->expects($this->atLeast(3))
             ->method('executeStatement')
-            ->withConsecutive(
-                [$this->stringContains('INSERT INTO')],
-                [$this->matches('create sql stmt')],
-                [$this->stringContains('INSERT INTO')]
-            )
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(
-                        $this->createMock(TableNotFoundException::class)
-                    ),
-                    1,
-                    1
-                )
-            );
+            ->willReturnCallback(function ($sql) use (&$series) {
+                [$constraint, $return] = array_shift($series);
+
+                if (null !== $constraint && !$constraint->evaluate($sql, '', true)) {
+                    $this->fail();
+                }
+
+                if ($return instanceof \Exception) {
+                    throw $return;
+                }
+
+                return $return;
+            })
+        ;
 
         $conn->method('isTransactionActive')
             ->willReturn(true);
@@ -145,21 +152,28 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     public function testTableCreationInTransactionNotSupported()
     {
         $conn = $this->createMock(Connection::class);
+
+        $series = [
+            [$this->stringContains('INSERT INTO'), $this->createMock(TableNotFoundException::class)],
+            [$this->stringContains('INSERT INTO'), 1],
+        ];
+
         $conn->expects($this->atLeast(2))
             ->method('executeStatement')
-            ->withConsecutive(
-                [$this->stringContains('INSERT INTO')],
-                [$this->stringContains('INSERT INTO')]
-            )
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(
-                        $this->createMock(TableNotFoundException::class)
-                    ),
-                    1,
-                    1
-                )
-            );
+            ->willReturnCallback(function ($sql) use (&$series) {
+                [$constraint, $return] = array_shift($series);
+
+                if (null !== $constraint && !$constraint->evaluate($sql, '', true)) {
+                    $this->fail();
+                }
+
+                if ($return instanceof \Exception) {
+                    throw $return;
+                }
+
+                return $return;
+            })
+        ;
 
         $conn->method('isTransactionActive')
             ->willReturn(true);
@@ -181,22 +195,29 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     public function testCreatesTableOutsideTransaction()
     {
         $conn = $this->createMock(Connection::class);
+
+        $series = [
+            [$this->stringContains('INSERT INTO'), $this->createMock(TableNotFoundException::class)],
+            [$this->matches('create sql stmt'), 1],
+            [$this->stringContains('INSERT INTO'), 1],
+        ];
+
         $conn->expects($this->atLeast(3))
             ->method('executeStatement')
-            ->withConsecutive(
-                [$this->stringContains('INSERT INTO')],
-                [$this->matches('create sql stmt')],
-                [$this->stringContains('INSERT INTO')]
-            )
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(
-                        $this->createMock(TableNotFoundException::class)
-                    ),
-                    1,
-                    1
-                )
-            );
+            ->willReturnCallback(function ($sql) use (&$series) {
+                [$constraint, $return] = array_shift($series);
+
+                if (null !== $constraint && !$constraint->evaluate($sql, '', true)) {
+                    $this->fail();
+                }
+
+                if ($return instanceof \Exception) {
+                    throw $return;
+                }
+
+                return $return;
+            })
+        ;
 
         $conn->method('isTransactionActive')
             ->willReturn(false);

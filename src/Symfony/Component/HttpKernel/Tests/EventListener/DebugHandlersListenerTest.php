@@ -222,7 +222,14 @@ class DebugHandlersListenerTest extends TestCase
         $handler
             ->expects($this->exactly(\count($expectedCalls)))
             ->method('setDefaultLogger')
-            ->withConsecutive(...$expectedCalls);
+            ->willReturnCallback(function (LoggerInterface $logger, $levels) use (&$expectedCalls) {
+                [$expectedLogger, $expectedLevels] = array_shift($expectedCalls);
+
+                if ($expectedLogger !== $logger || $expectedLevels !== $levels) {
+                    $this->fail();
+                }
+            })
+        ;
 
         $sut = new DebugHandlersListener(null, $logger, $levels, null, true, true, $deprecationLogger);
         $prevHander = set_exception_handler([$handler, 'handleError']);

@@ -138,12 +138,20 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
         $structure->expects($this->once())
             ->method('removeAxis')
             ->with('fourth');
+
         $structure->expects($this->exactly(2))
             ->method('addAxis')
-            ->withConsecutive(
-                ['first'],
-                ['third']
-            );
+            ->with($this->callback(function (string $axis) {
+                static $series = [
+                    'first',
+                    'third',
+                ];
+
+                $expectedArg = array_shift($series);
+
+                return $axis === $expectedArg;
+            }))
+        ;
 
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
     }
