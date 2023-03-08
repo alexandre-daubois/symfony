@@ -742,8 +742,13 @@ class LocoProviderTest extends ProviderTestCase
         $loader = $this->getLoader();
         $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
-            ->withConsecutive(...$consecutiveLoadArguments)
-            ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
+            ->willReturnCallback(function (...$args) use (&$consecutiveLoadArguments, &$consecutiveLoadReturns) {
+                if ($args === array_shift($consecutiveLoadArguments)) {
+                    return array_shift($consecutiveLoadReturns);
+                }
+
+                $this->fail();
+            });
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',

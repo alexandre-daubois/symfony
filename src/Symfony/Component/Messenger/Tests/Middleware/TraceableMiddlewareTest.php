@@ -43,19 +43,30 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $stopwatch = $this->createMock(Stopwatch::class);
         $stopwatch->expects($this->exactly(2))->method('isStarted')->willReturn(true);
+
+        $startSeries = [
+            [$this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
+            [$this->identicalTo('Tail on "command_bus"'), 'messenger.middleware'],
+        ];
+
         $stopwatch->expects($this->exactly(2))
             ->method('start')
-            ->withConsecutive(
-                [$this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
-                ['Tail on "command_bus"', 'messenger.middleware']
-            )
+            ->willReturnCallback(function (string $name, string $category) use (&$startSeries) {
+                [$constraint, $expectedCategory] = array_shift($startSeries);
+
+                return $constraint->evaluate($name, '', true) && $expectedCategory === $name;
+            })
         ;
         $stopwatch->expects($this->exactly(2))
             ->method('stop')
-            ->withConsecutive(
-                ['"Symfony\Component\Messenger\Middleware\MiddlewareInterface@anonymous" on "command_bus"'],
-                ['Tail on "command_bus"']
-            )
+            ->with($this->callback(function (string $name) {
+                static $stopSeries = [
+                    '"Symfony\Component\Messenger\Middleware\MiddlewareInterface@anonymous" on "command_bus"',
+                    'Tail on "command_bus"',
+                ];
+
+                return $name === array_shift($stopSeries);
+            }))
         ;
 
         $traced = new TraceableMiddleware($stopwatch, $busId);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
+use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -86,17 +87,34 @@ class SerializerTest extends TestCase
             ->with($serializerStamp = new SerializerStamp([ObjectNormalizer::GROUPS => ['foo']]))
             ->with($validationStamp = new ValidationStamp(['foo', 'bar']));
 
+        $series = [
+            [$this->anything()],
+            [$this->anything()],
+            [$message, 'json', [
+                ObjectNormalizer::GROUPS => ['foo'],
+                Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
+            ]]
+        ];
+
         $symfonySerializer
             ->expects($this->exactly(3))
             ->method('serialize')
-            ->withConsecutive(
-                [$this->anything()],
-                [$this->anything()],
-                [$message, 'json', [
-                    ObjectNormalizer::GROUPS => ['foo'],
-                    Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
-                ]]
-            )
+            ->willReturnCallback(function (...$args) use (&$series) {
+                $expectedArgs = array_shift($series);
+
+                if ($expectedArgs[0] instanceof Constraint) {
+                    if (!$expectedArgs[0]->evaluate($args, '', true)) {
+                        $this->fail();
+                    }
+
+                    return;
+                }
+
+                if ($expectedArgs !== $args) {
+                    dump($expectedArgs, $args);
+                    $this->fail();
+                }
+            })
         ;
 
         $encoded = $serializer->encode($envelope);
@@ -114,20 +132,25 @@ class SerializerTest extends TestCase
             $symfonySerializer = $this->createMock(SerializerComponentInterface::class)
         );
 
+        $stamp = [new SerializerStamp(['groups' => ['foo']])];
+        $message = new DummyMessage('test');
+
+        $series = [
+            [['[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', [Serializer::MESSENGER_SERIALIZATION_CONTEXT => true]], $stamp],
+            [['{}', DummyMessage::class, 'json', [
+                ObjectNormalizer::GROUPS => ['foo'],
+                Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
+            ]], $message]
+        ];
+
         $symfonySerializer
             ->expects($this->exactly(2))
             ->method('deserialize')
-            ->withConsecutive(
-                ['[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', [Serializer::MESSENGER_SERIALIZATION_CONTEXT => true]],
-                ['{}', DummyMessage::class, 'json', [
-                    ObjectNormalizer::GROUPS => ['foo'],
-                    Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
-                ]]
-            )
-            ->willReturnOnConsecutiveCalls(
-                [new SerializerStamp(['groups' => ['foo']])],
-                new DummyMessage('test')
-            )
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+
+                return $expectedArgs === $args ? $return : $this->fail();
+            })
         ;
 
         $serializer->decode([

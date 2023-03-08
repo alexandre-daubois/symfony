@@ -123,9 +123,19 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $ldap = $this->createMock(LdapInterface::class);
         $ldap
             ->method('bind')
-            ->withConsecutive(
-                ['elsa', 'test1234A$']
-            );
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['elsa', 'test1234A$'],
+                    ['', 'bar'],
+                ];
+
+                $expectedArgs = array_shift($series);
+
+                if ($expectedArgs !== $args) {
+                    $this->fail();
+                }
+            })
+        ;
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -169,9 +179,19 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $ldap = $this->createMock(LdapInterface::class);
         $ldap
             ->method('bind')
-            ->withConsecutive(
-                ['elsa', 'test1234A$']
-            );
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['elsa', 'test1234A$'],
+                    ['', 'bar'],
+                ];
+
+                $expectedArgs = array_shift($series);
+
+                if ($expectedArgs !== $args) {
+                    $this->fail();
+                }
+            })
+        ;
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -213,9 +233,19 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $ldap = $this->createMock(LdapInterface::class);
         $ldap
             ->method('bind')
-            ->withConsecutive(
-                ['elsa', 'test1234A$']
-            );
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['elsa', 'test1234A$'],
+                    ['', 'bar'],
+                ];
+
+                $expectedArgs = array_shift($series);
+
+                if ($expectedArgs !== $args) {
+                    $this->fail();
+                }
+            })
+        ;
         $ldap
             ->expects($this->once())
             ->method('query')

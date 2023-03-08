@@ -197,10 +197,16 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $this->logger->expects($this->exactly(2))
             ->method('debug')
-            ->withConsecutive(
-                ['Ignoring query parameter "_my_failure_path": not a valid URL.'],
-                ['Authentication failure, redirect triggered.', ['failure_path' => '/login']]
-            );
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['Ignoring query parameter "_my_failure_path": not a valid URL.', []],
+                    ['Authentication failure, redirect triggered.', ['failure_path' => '/login']],
+                ];
+
+                if ($args !== array_shift($series)) {
+                    $this->fail();
+                }
+            });
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
 

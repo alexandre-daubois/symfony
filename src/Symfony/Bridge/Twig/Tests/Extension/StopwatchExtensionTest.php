@@ -67,12 +67,33 @@ class StopwatchExtensionTest extends TestCase
             $expectedStopCalls[] = [$this->equalTo($eventName)];
         }
 
-        $startInvocationMocker = $stopwatch->expects($this->exactly($expectedCalls))
-            ->method('start');
-        \call_user_func_array([$startInvocationMocker, 'withConsecutive'], $expectedStartCalls);
-        $stopInvocationMocker = $stopwatch->expects($this->exactly($expectedCalls))
-            ->method('stop');
-        \call_user_func_array([$stopInvocationMocker, 'withConsecutive'], $expectedStopCalls);
+        $stopwatch
+            ->expects($this->exactly($expectedCalls))
+            ->method('start')
+            ->willReturnCallback(function (string $name, string $category) use (&$expectedStartCalls) {
+                [$expectedName, $expectedCategory] = array_shift($expectedStartCalls);
+
+                if (!$expectedName->evaluate($name, '', true)) {
+                    $this->fail();
+                }
+
+                if ($expectedCategory !== $category) {
+                    $this->fail();
+                }
+            })
+        ;
+
+        $stopwatch
+            ->expects($this->exactly($expectedCalls))
+            ->method('stop')
+            ->willReturnCallback(function (string $name) use (&$expectedStopCalls) {
+                [$expectedName] = array_shift($expectedStopCalls);
+
+                if (!$expectedName->evaluate($name, '', true)) {
+                    $this->fail();
+                }
+            })
+        ;
 
         return $stopwatch;
     }
