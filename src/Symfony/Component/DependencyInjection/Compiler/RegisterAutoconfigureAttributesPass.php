@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\Attribute\Factory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -57,8 +58,15 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
         $yamlLoader = $parseDefinitions->getDeclaringClass()->newInstanceWithoutConstructor();
 
         self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
-            $attribute = (array) $attribute->newInstance();
+            $attribute = $attribute->newInstance();
 
+            if ($attribute instanceof Factory) {
+                if (\is_string($attribute->factory) && $class->hasMethod($attribute->factory)) {
+                    $attribute->factory = [null, $attribute->factory];
+                }
+            }
+
+            $attribute = (array) $attribute;
             foreach ($attribute['tags'] ?? [] as $i => $tag) {
                 if (\is_array($tag) && [0] === array_keys($tag)) {
                     $attribute['tags'][$i] = [$class->name => $tag[0]];

@@ -23,6 +23,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
     bind: [
         '$bar' => 1,
     ],
+    factory: [
+        null,
+        'create'
+    ]
 )]
 class AutoconfigureAttributed
 {
