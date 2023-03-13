@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -310,6 +311,16 @@ class YamlFileLoaderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The value of the "factory" option for the "invalid_factory" service must be the id of the service without the "@" prefix (replace "@factory:method" with "factory:method"');
         $loader->load('bad_factory_syntax.yml');
+    }
+
+    public function testStaticConstructorWithFactory()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "invalid_service" service cannot declare a factory as well as a constructor method.');
+        $loader->load('constructor_with_factory.yml');
     }
 
     public function testExtensions()
@@ -1148,5 +1159,15 @@ class YamlFileLoaderTest extends TestCase
 
         $definition = $container->getDefinition('closure_property')->getProperties()['foo'];
         $this->assertEquals((new Definition('Closure'))->setFactory(['Closure', 'fromCallable'])->addArgument(new Reference('bar')), $definition);
+    }
+
+    public function testStaticConstructor()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('static_constructor.yml');
+
+        $definition = $container->getDefinition('static_constructor');
+        $this->assertEquals((new Definition('stdClass'))->setConstructor('create'), $definition);
     }
 }

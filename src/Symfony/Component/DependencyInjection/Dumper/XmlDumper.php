@@ -166,7 +166,12 @@ class XmlDumper extends Dumper
 
         $this->addMethodCalls($definition->getMethodCalls(), $service);
 
-        if ($callable = $definition->getFactory()) {
+        if ($constructorName = $definition->getConstructor()) {
+            $constructor = $this->document->createElement('constructor');
+            $constructor->setAttribute('method', $constructorName);
+
+            $service->appendChild($constructor);
+        } elseif ($callable = $definition->getFactory()) {
             $factory = $this->document->createElement('factory');
 
             if (\is_array($callable) && $callable[0] instanceof Definition) {

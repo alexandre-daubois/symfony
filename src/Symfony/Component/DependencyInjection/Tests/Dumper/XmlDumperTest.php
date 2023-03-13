@@ -296,4 +296,12 @@ class XmlDumperTest extends TestCase
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_with_array_tags.xml'), $dumper->dump());
     }
+
+    public function testDumpStaticConstructor()
+    {
+        $container = include self::$fixturesPath.'/containers/container_static_constructor.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_with_static_constructor.xml'), $dumper->dump());
+    }
 }

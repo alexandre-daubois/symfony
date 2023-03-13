@@ -126,6 +126,10 @@
     <xsd:attribute name="expression" type="xsd:string" />
   </xsd:complexType>
 
+  <xsd:complexType name="constructor">
+    <xsd:attribute name="method" type="xsd:string" />
+  </xsd:complexType>
+
   <xsd:complexType name="defaults">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
@@ -147,6 +151,7 @@
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="factory" type="factory" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="constructor" type="constructor" minOccurs="0" maxOccurs="1" />
       <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />

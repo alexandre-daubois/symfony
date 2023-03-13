@@ -49,6 +49,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
+use Symfony\Component\DependencyInjection\Tests\Compiler\StaticConstructor;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
@@ -1797,6 +1798,19 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $this->assertSame('some value', $container->get('bar')->foo);
+    }
+
+    public function testStaticConstructor()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', StaticConstructor::class)
+            ->setPublic(true)
+            ->setConstructor('create')
+            ->setArgument('$foo', 'some value')
+        ;
+        $container->compile();
+
+        $this->assertSame('some value', $container->get('foo')->getBar());
     }
 
     public function testWither()

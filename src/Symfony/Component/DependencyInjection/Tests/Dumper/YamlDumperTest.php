@@ -181,6 +181,14 @@ class YamlDumperTest extends TestCase
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_array_tags.yml'), $dumper->dump());
     }
 
+    public function testDumpStaticConstructor()
+    {
+        $container = include self::$fixturesPath.'/containers/container_static_constructor.php';
+        $dumper = new YamlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_constructor.yml'), $dumper->dump());
+    }
+
     private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')
     {
         $parser = new Parser();

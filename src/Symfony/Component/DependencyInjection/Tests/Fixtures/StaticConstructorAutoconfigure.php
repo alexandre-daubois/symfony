@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Factory;
 
-#[Factory([null, 'create'], ['$foo' => 'foo'])]
-class FactoryAttributeService
+#[Autoconfigure(bind: ['$foo' => 'foo'], constructor: 'create')]
+class StaticConstructorAutoconfigure
 {
     public function __construct(private readonly string $bar)
     {

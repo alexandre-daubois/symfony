@@ -522,3 +522,20 @@ final class ElsaAction
     {
     }
 }
+
+class StaticConstructor
+{
+    public function __construct(private string $bar)
+    {
+    }
+
+    public function getBar(): string
+    {
+        return $this->bar;
+    }
+
+    public static function create(string $foo): static
+    {
+        return new self($foo);
+    }
+}

@@ -105,6 +105,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
         $def->setFactory($parentDef->getFactory());
+        $def->setConstructor($parentDef->getConstructor());
         $def->setConfigurator($parentDef->getConfigurator());
         $def->setFile($parentDef->getFile());
         $def->setPublic($parentDef->isPublic());
@@ -123,6 +124,9 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         }
         if (isset($changes['factory'])) {
             $def->setFactory($definition->getFactory());
+        }
+        if (isset($changes['constructor'])) {
+            $def->setConstructor($definition->getConstructor());
         }
         if (isset($changes['configurator'])) {
             $def->setConfigurator($definition->getConfigurator());

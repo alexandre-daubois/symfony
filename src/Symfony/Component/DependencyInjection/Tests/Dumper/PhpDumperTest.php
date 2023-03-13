@@ -43,6 +43,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Compiler\A;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
@@ -1686,6 +1687,19 @@ PHP
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/closure.php', $dumper->dump());
+    }
+
+    public function testStaticConstructor()
+    {
+        $container = new ContainerBuilder();
+        $container->register('static_constructor', A::class)
+            ->setPublic('true')
+            ->setArgument('$foo', 'foo')
+            ->setConstructor('create');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/static_constructor.php', $dumper->dump());
     }
 
     public function testAutowireClosure()

@@ -438,4 +438,21 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $def = $container->getDefinition('child');
         $this->assertTrue($def->isSynthetic());
     }
+
+    public function testProcessCopiesStaticConstructor()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent');
+
+        $container
+            ->setDefinition('child', new ChildDefinition('parent'))
+            ->setConstructor('create')
+        ;
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child');
+        $this->assertSame('create', $def->getConstructor());
+    }
 }

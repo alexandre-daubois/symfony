@@ -23,6 +23,7 @@ class InlineServiceConfigurator extends AbstractConfigurator
     use Traits\BindTrait;
     use Traits\CallTrait;
     use Traits\ConfiguratorTrait;
+    use Traits\StaticConstructorTrait;
     use Traits\FactoryTrait;
     use Traits\FileTrait;
     use Traits\LazyTrait;

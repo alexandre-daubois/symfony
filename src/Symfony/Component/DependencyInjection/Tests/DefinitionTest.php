@@ -44,6 +44,14 @@ class DefinitionTest extends TestCase
         $this->assertSame(['factory' => true], $def->getChanges());
     }
 
+    public function testSetGetConstructor()
+    {
+        $def = new Definition();
+
+        $this->assertSame($def, $def->setConstructor('foo'), '->setConstructor() implements a fluent interface');
+        $this->assertEquals('foo', $def->getConstructor(), '->getConstructor() returns the constructor');
+    }
+
     public function testSetGetClass()
     {
         $def = new Definition('stdClass');

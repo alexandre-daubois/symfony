@@ -27,6 +27,7 @@ class Definition
     private ?string $class = null;
     private ?string $file = null;
     private string|array|null $factory = null;
+    private string|null $constructor = null;
     private bool $shared = true;
     private array $deprecation = [];
     private array $properties = [];
@@ -121,6 +122,32 @@ class Definition
     public function getFactory(): string|array|null
     {
         return $this->factory;
+    }
+
+    /**
+     * Sets a constructor.
+     *
+     * @param string|null $constructor The name of the public static function of the service to call to create itself.
+     *
+     * @return $this
+     */
+    public function setConstructor(string|null $constructor): static
+    {
+        $this->changes['constructor'] = true;
+
+        $this->constructor = $constructor;
+
+        return $this;
+    }
+
+    /**
+     * Gets the constructor.
+     *
+     * @return string|null The name of the public static function of the service to call to create itself.
+     */
+    public function getConstructor(): string|null
+    {
+        return $this->constructor;
     }
 
     /**

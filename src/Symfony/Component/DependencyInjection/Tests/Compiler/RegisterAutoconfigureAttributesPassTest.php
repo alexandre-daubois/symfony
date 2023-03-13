@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureAttributed;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredInterface;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryAttributeService;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StaticConstructorAutoconfigure;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryAttributeServiceAsString;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 
@@ -49,7 +49,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
             ->addTag('another_tag', ['attr' => 234])
             ->addMethodCall('setBar', [2, 3])
             ->setBindings(['$bar' => $argument])
-            ->setFactory([null, 'create'])
+            ->setConstructor('create')
         ;
         $this->assertEquals([AutoconfigureAttributed::class => $expected], $container->getAutoconfiguredInstanceof());
     }
@@ -92,37 +92,20 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testFactoryAttribute()
+    public function testStaticConstructor()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', FactoryAttributeService::class)
+        $container->register('foo', StaticConstructorAutoconfigure::class)
             ->setAutoconfigured(true);
 
-        $argument = new BoundArgument('foo', false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__.'/../Fixtures/FactoryAttributeService.php'));
+        $argument = new BoundArgument('foo', false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__ . '/../Fixtures/StaticConstructorAutoconfigure.php'));
 
         (new RegisterAutoconfigureAttributesPass())->process($container);
 
         $expected = (new ChildDefinition(''))
-            ->setFactory([null, 'create'])
+            ->setConstructor('create')
             ->setBindings(['$foo' => $argument])
         ;
-        $this->assertEquals([FactoryAttributeService::class => $expected], $container->getAutoconfiguredInstanceof());
-    }
-
-    public function testFactoryAttributeAsString()
-    {
-        $container = new ContainerBuilder();
-        $container->register('foo', FactoryAttributeServiceAsString::class)
-            ->setAutoconfigured(true);
-
-        $argument = new BoundArgument('foo', false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__.'/../Fixtures/FactoryAttributeServiceAsString.php'));
-
-        (new RegisterAutoconfigureAttributesPass())->process($container);
-
-        $expected = (new ChildDefinition(''))
-            ->setFactory([null, 'create'])
-            ->setBindings(['$foo' => $argument])
-        ;
-        $this->assertEquals([FactoryAttributeServiceAsString::class => $expected], $container->getAutoconfiguredInstanceof());
+        $this->assertEquals([StaticConstructorAutoconfigure::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 }
