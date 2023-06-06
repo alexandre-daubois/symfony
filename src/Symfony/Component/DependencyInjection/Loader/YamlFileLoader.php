@@ -844,8 +844,12 @@ class YamlFileLoader extends FileLoader
 
                 $argument = $this->resolveServices($argument, $file, $isParameter);
 
-                if (isset($argument[0])) {
-                    trigger_deprecation('symfony/dependency-injection', '6.3', 'Using integers as keys in a "!service_locator" tag is deprecated. The keys will default to the IDs of the original services in 7.0.');
+                foreach ($argument as $k => $v) {
+                    if (\is_int($k)) {
+                        $argument[(string) $v] = $v;
+
+                        unset($argument[$k]);
+                    }
                 }
 
                 return new ServiceLocatorArgument($argument);

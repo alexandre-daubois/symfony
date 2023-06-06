@@ -5,6 +5,18 @@ Symfony 6.4 and Symfony 7.0 will be released simultaneously at the end of Novemb
 release process, both versions will have the same features, but Symfony 7.0 won't include any deprecated features.
 To upgrade, make sure to resolve all deprecation notices.
 
+DependencyInjection
+-------------------
+
+ * Remove `#[MapDecorated]`, use `#[AutowireDecorated]` instead
+ * Remove `ProxyHelper`, use `Symfony\Component\VarExporter\ProxyHelper` instead
+ * Remove `ReferenceSetArgumentTrait`
+ * Remove support of `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
+ * Passing `null` to `ContainerAwareTrait::setContainer()` must be done explicitly
+ * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` instead
+ * Parameter names of `ParameterBag` cannot be numerics
+ * Remove `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+
 DoctrineBridge
 --------------
 
@@ -15,6 +27,7 @@ DoctrineBridge
  * Remove `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * `ContainerAwareEventManager::getListeners()` must be called with an event name
  * DoctrineBridge now requires `doctrine/event-manager:^2`
+ * Remove `ContainerAwareLoader`, use dependency injection in your fixtures instead
 
 ProxyManagerBridge
 ------------------

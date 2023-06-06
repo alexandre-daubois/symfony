@@ -422,13 +422,8 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
     }
 
-    /**
-     * @group legacy
-     */
     public function testServiceWithServiceLocatorArgument()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Using integers as keys in a "!service_locator" tag is deprecated. The keys will default to the IDs of the original services in 7.0.');
-
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_with_service_locator_argument.yml');
@@ -436,10 +431,10 @@ class YamlFileLoaderTest extends TestCase
         $values = ['foo' => new Reference('foo_service'), 'bar' => new Reference('bar_service')];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_indexed')->getArguments());
 
-        $values = [new Reference('foo_service'), new Reference('bar_service')];
+        $values = ['foo_service' => new Reference('foo_service'), 'bar_service' => new Reference('bar_service')];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_not_indexed')->getArguments());
 
-        $values = ['foo' => new Reference('foo_service'), 0 => new Reference('bar_service')];
+        $values = ['foo' => new Reference('foo_service'), 'bar_service' => new Reference('bar_service')];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_mixed')->getArguments());
     }
 

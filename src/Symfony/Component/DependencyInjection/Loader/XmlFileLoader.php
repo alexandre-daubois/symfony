@@ -584,8 +584,12 @@ class XmlFileLoader extends FileLoader
                 case 'service_locator':
                     $arg = $this->getArgumentsAsPhp($arg, $name, $file);
 
-                    if (isset($arg[0])) {
-                        trigger_deprecation('symfony/dependency-injection', '6.3', 'Skipping "key" argument or using integers as values in a "service_locator" tag is deprecated. The keys will default to the IDs of the original services in 7.0.');
+                    foreach ($arg as $k => $v) {
+                        if (\is_int($k)) {
+                            $arg[(string) $v] = $v;
+
+                            unset($arg[$k]);
+                        }
                     }
 
                     $arguments[$key] = new ServiceLocatorArgument($arg);

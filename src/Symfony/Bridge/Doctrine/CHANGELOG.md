@@ -11,6 +11,7 @@ CHANGELOG
  * Remove `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * `ContainerAwareEventManager::getListeners()` must be called with an event name
  * DoctrineBridge now requires `doctrine/event-manager:^2`
+ * Remove `ContainerAwareLoader`, use dependency injection in your fixtures instead
 
 6.4
 ---
