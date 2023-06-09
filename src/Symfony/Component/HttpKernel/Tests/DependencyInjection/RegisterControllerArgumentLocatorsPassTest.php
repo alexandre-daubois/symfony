@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -545,9 +547,14 @@ class RegisterTestController
     }
 }
 
-class ContainerAwareRegisterTestController implements ContainerAwareInterface
+class ContainerAwareRegisterTestController
 {
-    use ContainerAwareTrait;
+    protected ?ContainerInterface $container;
+
+    public function setContainer(ContainerInterface $container = null): void
+    {
+        $this->container = $container;
+    }
 
     public function fooAction(ControllerDummy $bar)
     {

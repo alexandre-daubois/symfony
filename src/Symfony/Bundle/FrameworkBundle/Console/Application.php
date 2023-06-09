@@ -115,6 +115,7 @@ class Application extends BaseApplication
         $command = parent::get($name);
 
         if ($command instanceof ContainerAwareInterface) {
+            trigger_deprecation('symfony/dependency-injection', '6.4', sprintf('Command "%s" must not implement "%s", use dependency injection instead.', $command::class, ContainerAwareInterface::class));
             $command->setContainer($this->kernel->getContainer());
         }
 

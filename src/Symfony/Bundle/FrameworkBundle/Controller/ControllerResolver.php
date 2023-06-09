@@ -26,6 +26,7 @@ class ControllerResolver extends ContainerControllerResolver
         $controller = parent::instantiateController($class);
 
         if ($controller instanceof ContainerAwareInterface) {
+            trigger_deprecation('symfony/dependency-injection', '6.4', sprintf('Implementing "%s" in controller "%s" is deprecated, use dependency injection instead.', ContainerAwareInterface::class, $controller::class));
             $controller->setContainer($this->container);
         }
         if ($controller instanceof AbstractController) {

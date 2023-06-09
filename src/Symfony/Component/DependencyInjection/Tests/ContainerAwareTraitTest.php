@@ -17,13 +17,15 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @group legacy
+ *
+ * @deprecated since Symfony 6.4, to be removed in Symfony 7.0
+ */
 class ContainerAwareTraitTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    /**
-     * @group legacy
-     */
     public function testSetContainerLegacy()
     {
         $container = $this->createMock(ContainerInterface::class);

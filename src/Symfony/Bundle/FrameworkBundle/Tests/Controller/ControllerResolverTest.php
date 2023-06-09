@@ -13,22 +13,30 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Psr\Container\ContainerInterface as Psr11ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
 
 class ControllerResolverTest extends ContainerControllerResolverTest
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testGetControllerOnContainerAware()
     {
         $resolver = $this->createControllerResolver();
         $request = Request::create('/');
         $request->attributes->set('_controller', 'Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction');
 
+        $this->expectDeprecation('Since symfony/dependency-injection 6.4: Implementing "Symfony\Component\DependencyInjection\ContainerAwareInterface" in controller "Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController" is deprecated, use dependency injection instead.');
         $controller = $resolver->getController($request);
 
         $this->assertInstanceOf(ContainerAwareController::class, $controller[0]);
@@ -36,18 +44,25 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame('testAction', $controller[1]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetControllerOnContainerAwareInvokable()
     {
         $resolver = $this->createControllerResolver();
         $request = Request::create('/');
         $request->attributes->set('_controller', 'Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController');
 
+        $this->expectDeprecation('Since symfony/dependency-injection 6.4: Implementing "Symfony\Component\DependencyInjection\ContainerAwareInterface" in controller "Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController" is deprecated, use dependency injection instead.');
         $controller = $resolver->getController($request);
 
         $this->assertInstanceOf(ContainerAwareController::class, $controller);
         $this->assertInstanceOf(ContainerInterface::class, $controller->getContainer());
     }
 
+    /**
+     * @group legacy
+     */
     public function testContainerAwareControllerGetsContainerWhenNotSet()
     {
         class_exists(AbstractControllerTest::class);
@@ -62,6 +77,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::testAction');
 
+        $this->expectDeprecation('Since symfony/dependency-injection 6.4: Implementing "Symfony\Component\DependencyInjection\ContainerAwareInterface" in controller "Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController" is deprecated, use dependency injection instead.');
         $this->assertSame([$controller, 'testAction'], $resolver->getController($request));
         $this->assertSame($container, $controller->getContainer());
     }
