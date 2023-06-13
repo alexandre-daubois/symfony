@@ -213,7 +213,7 @@ index 38618fc15e..eb599eb0b4 100644
      {
          $this->clearEntityManagers();
 diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
-index f4fb8173e8..6db6c5e4ec 100644
+index 4a19f49cdb..a1cd2c5beb 100644
 --- a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 +++ b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 @@ -62,5 +62,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
@@ -2139,7 +2139,7 @@ index cc024da461..00b79e915f 100644
      {
          $errors = [];
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index b7aaa6a29e..dd14cf2c5c 100644
+index f8526ae5ce..72da224185 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
 @@ -114,5 +114,5 @@ class Application implements ResetInterface
@@ -2269,66 +2269,66 @@ index b7aaa6a29e..dd14cf2c5c 100644
      {
          foreach ($command->getHelperSet() as $helper) {
 diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Component/Console/Command/Command.php
-index 704b112d1a..b296bffcbd 100644
+index fae37b686a..5bc670292d 100644
 --- a/src/Symfony/Component/Console/Command/Command.php
 +++ b/src/Symfony/Component/Console/Command/Command.php
-@@ -145,5 +145,5 @@ class Command
+@@ -111,5 +111,5 @@ class Command
       * @return void
       */
 -    public function ignoreValidationErrors()
 +    public function ignoreValidationErrors(): void
      {
          $this->ignoreValidationErrors = true;
-@@ -153,5 +153,5 @@ class Command
+@@ -119,5 +119,5 @@ class Command
       * @return void
       */
--    public function setApplication(Application $application = null)
-+    public function setApplication(Application $application = null): void
+-    public function setApplication(?Application $application)
++    public function setApplication(?Application $application): void
      {
-         if (1 > \func_num_args()) {
-@@ -171,5 +171,5 @@ class Command
+         $this->application = $application;
+@@ -134,5 +134,5 @@ class Command
       * @return void
       */
 -    public function setHelperSet(HelperSet $helperSet)
 +    public function setHelperSet(HelperSet $helperSet): void
      {
          $this->helperSet = $helperSet;
-@@ -200,5 +200,5 @@ class Command
+@@ -163,5 +163,5 @@ class Command
       * @return bool
       */
 -    public function isEnabled()
 +    public function isEnabled(): bool
      {
          return true;
-@@ -210,5 +210,5 @@ class Command
+@@ -173,5 +173,5 @@ class Command
       * @return void
       */
 -    protected function configure()
 +    protected function configure(): void
      {
      }
-@@ -228,5 +228,5 @@ class Command
+@@ -191,5 +191,5 @@ class Command
       * @see setCode()
       */
 -    protected function execute(InputInterface $input, OutputInterface $output)
 +    protected function execute(InputInterface $input, OutputInterface $output): int
      {
          throw new LogicException('You must override the execute() method in the concrete command class.');
-@@ -242,5 +242,5 @@ class Command
+@@ -205,5 +205,5 @@ class Command
       * @return void
       */
 -    protected function interact(InputInterface $input, OutputInterface $output)
 +    protected function interact(InputInterface $input, OutputInterface $output): void
      {
      }
-@@ -258,5 +258,5 @@ class Command
+@@ -221,5 +221,5 @@ class Command
       * @return void
       */
 -    protected function initialize(InputInterface $input, OutputInterface $output)
 +    protected function initialize(InputInterface $input, OutputInterface $output): void
      {
      }
-@@ -701,5 +701,5 @@ class Command
+@@ -656,5 +656,5 @@ class Command
       * @throws InvalidArgumentException if the helper is not defined
       */
 -    public function getHelper(string $name): mixed
@@ -2365,14 +2365,14 @@ index 5850c3d7b8..e2371f88fd 100644
      {
          $this
 diff --git a/src/Symfony/Component/Console/Command/SignalableCommandInterface.php b/src/Symfony/Component/Console/Command/SignalableCommandInterface.php
-index 4d0876003d..d33732acb6 100644
+index 7ebffede11..40b301d18f 100644
 --- a/src/Symfony/Component/Console/Command/SignalableCommandInterface.php
 +++ b/src/Symfony/Component/Console/Command/SignalableCommandInterface.php
-@@ -31,4 +31,4 @@ interface SignalableCommandInterface
+@@ -29,4 +29,4 @@ interface SignalableCommandInterface
       * @return int|false The exit code to return or false to continue the normal execution
       */
--    public function handleSignal(int $signal, /* int|false $previousExitCode = 0 */);
-+    public function handleSignal(int $signal, /* int|false $previousExitCode = 0 */): int|false;
+-    public function handleSignal(int $signal, int|false $previousExitCode = 0);
++    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false;
  }
 diff --git a/src/Symfony/Component/Console/DependencyInjection/AddConsoleCommandPass.php b/src/Symfony/Component/Console/DependencyInjection/AddConsoleCommandPass.php
 index 27705ddb63..1b25473f75 100644
@@ -2457,38 +2457,38 @@ index 433cd41978..02187a7ffc 100644
  
      /**
 diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php b/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
-index 346a474c61..db3012ced8 100644
+index f075e881d8..b93a539df1 100644
 --- a/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
 +++ b/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php
 @@ -42,5 +42,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
--    public function setForeground(string $color = null)
-+    public function setForeground(string $color = null): void
+-    public function setForeground(?string $color)
++    public function setForeground(?string $color): void
      {
-         if (1 > \func_num_args()) {
-@@ -53,5 +53,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
+         $this->color = new Color($this->foreground = $color ?: '', $this->background, $this->options);
+@@ -50,5 +50,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
--    public function setBackground(string $color = null)
-+    public function setBackground(string $color = null): void
+-    public function setBackground(?string $color)
++    public function setBackground(?string $color): void
      {
-         if (1 > \func_num_args()) {
-@@ -69,5 +69,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
+         $this->color = new Color($this->foreground, $this->background = $color ?: '', $this->options);
+@@ -63,5 +63,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
 -    public function setOption(string $option)
 +    public function setOption(string $option): void
      {
          $this->options[] = $option;
-@@ -78,5 +78,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
+@@ -72,5 +72,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
 -    public function unsetOption(string $option)
 +    public function unsetOption(string $option): void
      {
          $pos = array_search($option, $this->options);
-@@ -91,5 +91,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
+@@ -85,5 +85,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
 -    public function setOptions(array $options)
@@ -2574,31 +2574,31 @@ index eb32bce8fc..57edd56954 100644
      {
          $options = array_merge([
 diff --git a/src/Symfony/Component/Console/Helper/Helper.php b/src/Symfony/Component/Console/Helper/Helper.php
-index 3631b30f69..5e4407a591 100644
+index c80c1f468f..9578a074bb 100644
 --- a/src/Symfony/Component/Console/Helper/Helper.php
 +++ b/src/Symfony/Component/Console/Helper/Helper.php
 @@ -27,5 +27,5 @@ abstract class Helper implements HelperInterface
       * @return void
       */
--    public function setHelperSet(HelperSet $helperSet = null)
-+    public function setHelperSet(HelperSet $helperSet = null): void
+-    public function setHelperSet(?HelperSet $helperSet)
++    public function setHelperSet(?HelperSet $helperSet): void
      {
-         if (1 > \func_num_args()) {
-@@ -95,5 +95,5 @@ abstract class Helper implements HelperInterface
+         $this->helperSet = $helperSet;
+@@ -92,5 +92,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function formatTime(int|float $secs)
 +    public static function formatTime(int|float $secs): string
      {
          static $timeFormats = [
-@@ -127,5 +127,5 @@ abstract class Helper implements HelperInterface
+@@ -124,5 +124,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function formatMemory(int $memory)
 +    public static function formatMemory(int $memory): string
      {
          if ($memory >= 1024 * 1024 * 1024) {
-@@ -147,5 +147,5 @@ abstract class Helper implements HelperInterface
+@@ -144,5 +144,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
@@ -2833,16 +2833,16 @@ index 0f5617cd17..bdd5dd264f 100644
      {
          $this->stream = $stream;
 diff --git a/src/Symfony/Component/Console/Input/InputArgument.php b/src/Symfony/Component/Console/Input/InputArgument.php
-index 5cb151488d..2dc276a372 100644
+index fa57f5d0d4..e657b56ad7 100644
 --- a/src/Symfony/Component/Console/Input/InputArgument.php
 +++ b/src/Symfony/Component/Console/Input/InputArgument.php
 @@ -96,5 +96,5 @@ class InputArgument
       * @throws LogicException When incorrect default value is given
       */
--    public function setDefault(string|bool|int|float|array $default = null)
-+    public function setDefault(string|bool|int|float|array $default = null): void
+-    public function setDefault(string|bool|int|float|array|null $default)
++    public function setDefault(string|bool|int|float|array|null $default): void
      {
-         if (1 > \func_num_args()) {
+         if ($this->isRequired() && null !== $default) {
 diff --git a/src/Symfony/Component/Console/Input/InputAwareInterface.php b/src/Symfony/Component/Console/Input/InputAwareInterface.php
 index 0ad27b4558..f5e544930e 100644
 --- a/src/Symfony/Component/Console/Input/InputAwareInterface.php
@@ -2966,16 +2966,16 @@ index aaed5fd01d..e7de9bcdec 100644
 +    public function setInteractive(bool $interactive): void;
  }
 diff --git a/src/Symfony/Component/Console/Input/InputOption.php b/src/Symfony/Component/Console/Input/InputOption.php
-index fdf88dcc27..cf7a71a3c4 100644
+index c9e8aa82b6..ee7c119cd2 100644
 --- a/src/Symfony/Component/Console/Input/InputOption.php
 +++ b/src/Symfony/Component/Console/Input/InputOption.php
 @@ -182,5 +182,5 @@ class InputOption
       * @return void
       */
--    public function setDefault(string|bool|int|float|array $default = null)
-+    public function setDefault(string|bool|int|float|array $default = null): void
+-    public function setDefault(string|bool|int|float|array|null $default)
++    public function setDefault(string|bool|int|float|array|null $default): void
      {
-         if (1 > \func_num_args()) {
+         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
 diff --git a/src/Symfony/Component/Console/Input/StreamableInputInterface.php b/src/Symfony/Component/Console/Input/StreamableInputInterface.php
 index 4b95fcb11e..b95fab2601 100644
 --- a/src/Symfony/Component/Console/Input/StreamableInputInterface.php
@@ -3212,10 +3212,10 @@ index b00445ece8..5e9b1086b0 100644
      {
          $this->buffer .= $message;
 diff --git a/src/Symfony/Component/Console/Question/Question.php b/src/Symfony/Component/Console/Question/Question.php
-index 26896bb531..af97d04ddc 100644
+index dec0954e79..873b302873 100644
 --- a/src/Symfony/Component/Console/Question/Question.php
 +++ b/src/Symfony/Component/Console/Question/Question.php
-@@ -270,5 +270,5 @@ class Question
+@@ -264,5 +264,5 @@ class Question
       * @return bool
       */
 -    protected function isAssoc(array $array)
@@ -3615,24 +3615,24 @@ index b4e982c457..521a9531f8 100644
      {
          return $this->tag;
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
-index 95251dec82..74c2b38eb8 100644
+index f18baa57c6..995705aeea 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
-@@ -40,5 +40,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
+@@ -41,5 +41,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
       * @return void
       */
 -    public function process(ContainerBuilder $container)
 +    public function process(ContainerBuilder $container): void
      {
          $this->container = $container;
-@@ -54,5 +54,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
+@@ -55,5 +55,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
       * @return void
       */
 -    protected function enableExpressionProcessing()
 +    protected function enableExpressionProcessing(): void
      {
          $this->processExpressions = true;
-@@ -74,5 +74,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
+@@ -75,5 +75,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
       * @return mixed
       */
 -    protected function processValue(mixed $value, bool $isRoot = false)
@@ -3640,10 +3640,10 @@ index 95251dec82..74c2b38eb8 100644
      {
          if (\is_array($value)) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AnalyzeServiceReferencesPass.php b/src/Symfony/Component/DependencyInjection/Compiler/AnalyzeServiceReferencesPass.php
-index de033d9847..e515b6344c 100644
+index 4fea73217c..a8306cb860 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AnalyzeServiceReferencesPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AnalyzeServiceReferencesPass.php
-@@ -58,5 +58,5 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
+@@ -60,5 +60,5 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3662,10 +3662,10 @@ index 3f070dcc0c..aa0e5186bf 100644
      {
          foreach ($container->findTaggedServiceIds('auto_alias') as $serviceId => $tags) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-index f84a7faff0..fb0bb08933 100644
+index e28b60c6ea..a5b3d3d00b 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
-@@ -71,5 +71,5 @@ class AutowirePass extends AbstractRecursivePass
+@@ -73,5 +73,5 @@ class AutowirePass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3695,10 +3695,10 @@ index c62345f26e..098772e2ef 100644
      {
          foreach ($container->getDefinitions() as $id => $definition) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/CheckExceptionOnInvalidReferenceBehaviorPass.php b/src/Symfony/Component/DependencyInjection/Compiler/CheckExceptionOnInvalidReferenceBehaviorPass.php
-index 8f828d3221..fb41bd49a3 100644
+index 7a6dd76879..27d718e142 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/CheckExceptionOnInvalidReferenceBehaviorPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/CheckExceptionOnInvalidReferenceBehaviorPass.php
-@@ -29,5 +29,5 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
+@@ -31,5 +31,5 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3741,10 +3741,10 @@ index 2ad4a048ba..719267be1e 100644
 +    public function process(ContainerBuilder $container): void;
  }
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php b/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
-index d05878fe85..dc75d9ef10 100644
+index 92e1e2de4b..aa3e55d492 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/DecoratorServicePass.php
-@@ -31,5 +31,5 @@ class DecoratorServicePass extends AbstractRecursivePass
+@@ -33,5 +33,5 @@ class DecoratorServicePass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3752,10 +3752,10 @@ index d05878fe85..dc75d9ef10 100644
      {
          $definitions = new \SplPriorityQueue();
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php b/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
-index 92c6d56c72..bdfdc4b6cd 100644
+index dfba7fe3e1..3f05e2d35f 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/DefinitionErrorExceptionPass.php
-@@ -33,5 +33,5 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
+@@ -35,5 +35,5 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3774,10 +3774,10 @@ index 953b7f942e..96912701e5 100644
      {
          foreach ($container->getExtensions() as $extension) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/InlineServiceDefinitionsPass.php b/src/Symfony/Component/DependencyInjection/Compiler/InlineServiceDefinitionsPass.php
-index f4eb931412..0e5448aa91 100644
+index 57e14b77be..7f7450a79a 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/InlineServiceDefinitionsPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/InlineServiceDefinitionsPass.php
-@@ -41,5 +41,5 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
+@@ -43,5 +43,5 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3917,10 +3917,10 @@ index 93c3fd2672..250a640d63 100644
      {
          foreach ($container->getAliases() as $id => $alias) {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/RemoveUnusedDefinitionsPass.php b/src/Symfony/Component/DependencyInjection/Compiler/RemoveUnusedDefinitionsPass.php
-index df97a62f7e..60126d8d06 100644
+index d6ee5ea560..ebac675ef6 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/RemoveUnusedDefinitionsPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/RemoveUnusedDefinitionsPass.php
-@@ -30,5 +30,5 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass
+@@ -32,5 +32,5 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3928,10 +3928,10 @@ index df97a62f7e..60126d8d06 100644
      {
          try {
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php
-index 808cde2081..83063d607d 100644
+index 46d615f834..e0d0dbfc62 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php
-@@ -34,5 +34,5 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
+@@ -36,5 +36,5 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
       * @throws InvalidArgumentException if the service definition does not exist
       */
 -    public function process(ContainerBuilder $container)
@@ -3939,10 +3939,10 @@ index 808cde2081..83063d607d 100644
      {
          // First collect all alias targets that need to be replaced
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
-index 55a358efdf..be943ae655 100644
+index 68835d52aa..a6e75b89da 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
-@@ -36,5 +36,5 @@ class ResolveBindingsPass extends AbstractRecursivePass
+@@ -38,5 +38,5 @@ class ResolveBindingsPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3972,10 +3972,10 @@ index da02622b21..395c5a1de6 100644
      {
          $stacks = [];
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveHotPathPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveHotPathPass.php
-index bffb9dab85..40e484f5a5 100644
+index 705bb837b9..1c66600cfa 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveHotPathPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveHotPathPass.php
-@@ -29,5 +29,5 @@ class ResolveHotPathPass extends AbstractRecursivePass
+@@ -31,5 +31,5 @@ class ResolveHotPathPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -4005,10 +4005,10 @@ index 7a2a69aa6a..7a265cc8aa 100644
      {
          $this->container = $container;
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveNoPreloadPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveNoPreloadPass.php
-index 3302dd2cd2..459c22434b 100644
+index fb7991229f..e683f90650 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveNoPreloadPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveNoPreloadPass.php
-@@ -30,5 +30,5 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
+@@ -32,5 +32,5 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -4016,10 +4016,10 @@ index 3302dd2cd2..459c22434b 100644
      {
          $this->container = $container;
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveParameterPlaceHoldersPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveParameterPlaceHoldersPass.php
-index c4a1412ff2..2bb03c253e 100644
+index a78a6e508e..c99cd0146f 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveParameterPlaceHoldersPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveParameterPlaceHoldersPass.php
-@@ -37,5 +37,5 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
+@@ -39,5 +39,5 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
       * @throws ParameterNotFoundException
       */
 -    public function process(ContainerBuilder $container)
@@ -4027,10 +4027,10 @@ index c4a1412ff2..2bb03c253e 100644
      {
          $this->bag = $container->getParameterBag();
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveReferencesToAliasesPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveReferencesToAliasesPass.php
-index 3176d405f8..0bbc25ba9e 100644
+index 16d0e9fcb0..7e0df0625f 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveReferencesToAliasesPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveReferencesToAliasesPass.php
-@@ -26,5 +26,5 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
+@@ -28,5 +28,5 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -4571,7 +4571,7 @@ index 1ede090384..7b6b63c599 100644
      {
          throw new LogicException('Impossible to call remove() on a frozen ParameterBag.');
 diff --git a/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php b/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
-index 6ba8a4cf7c..5e5e22bc09 100644
+index a7b0aaaedc..b65322e66f 100644
 --- a/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
 +++ b/src/Symfony/Component/DependencyInjection/ParameterBag/ParameterBag.php
 @@ -35,5 +35,5 @@ class ParameterBag implements ParameterBagInterface
@@ -9665,7 +9665,7 @@ index 482cbef232..c6c50075f5 100644
      {
          // prevent concurrency within the same connection
 diff --git a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
-index b54c0d933c..4de765dd95 100644
+index 50a14cf28e..0f4a877b4d 100644
 --- a/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
 +++ b/src/Symfony/Component/Lock/Store/DoctrineDbalStore.php
 @@ -94,5 +94,5 @@ class DoctrineDbalStore implements PersistingStoreInterface
@@ -12449,10 +12449,10 @@ index dd6ea3c831..faa71809ec 100644
      {
          if (!$container->hasDefinition('translator.default')) {
 diff --git a/src/Symfony/Component/Translation/DependencyInjection/TranslatorPathsPass.php b/src/Symfony/Component/Translation/DependencyInjection/TranslatorPathsPass.php
-index f7f954eea1..b93248a69a 100644
+index 1756e3c8c5..1e22616d91 100644
 --- a/src/Symfony/Component/Translation/DependencyInjection/TranslatorPathsPass.php
 +++ b/src/Symfony/Component/Translation/DependencyInjection/TranslatorPathsPass.php
-@@ -44,5 +44,5 @@ class TranslatorPathsPass extends AbstractRecursivePass
+@@ -46,5 +46,5 @@ class TranslatorPathsPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
