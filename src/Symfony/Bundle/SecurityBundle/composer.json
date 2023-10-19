@@ -65,7 +65,8 @@
         "symfony/framework-bundle": "<6.4",
         "symfony/http-client": "<5.4",
         "symfony/ldap": "<5.4",
-        "symfony/twig-bundle": "<5.4"
+        "symfony/twig-bundle": "<5.4",
+        "symfony/workflow": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },
