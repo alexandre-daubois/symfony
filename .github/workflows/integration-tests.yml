@@ -132,16 +132,16 @@ jobs:
 
       - name: Configure Couchbase
         run: |
-          curl -s -u 'username=Administrator&password=111111' -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex%2Cfts'
-          curl -s -X POST http://localhost:8091/settings/web -d 'username=Administrator&password=111111&port=SAME'
-          curl -s -u Administrator:111111 -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
-          curl -s -u Administrator:111111 -X POST  http://localhost:8091/pools/default -d 'memoryQuota=256'
+          curl -s -u 'username=Administrator&password=111111@' -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex%2Cfts'
+          curl -s -X POST http://localhost:8091/settings/web -d 'username=Administrator&password=111111%40&port=SAME'
+          curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
+          curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default -d 'memoryQuota=256'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "json,couchbase-3.2.2,memcached,mongodb-1.10.0,redis-5.3.4,rdkafka,xsl,ldap"
+          extensions: "json,couchbase-3.0.4,memcached,mongodb-1.10.0,redis-5.3.4,rdkafka,xsl,ldap"
           ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           tools: pecl

@@ -67,10 +67,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 
         set_error_handler(function ($type, $msg, $file, $line): bool { throw new \ErrorException($msg, 0, $type, $file, $line); });
 
-        $dsnPattern = '/^(?<protocol>couchbase(?:s)?)\:\/\/(?:(?<username>[^\:]+)\:(?<password>[^\@]{6,})@)?'
-            .'(?<host>[^\:]+(?:\:\d+)?)(?:\/(?<bucketName>[^\/\?]+))(?:(?:\/(?<scopeName>[^\/]+))'
-            .'(?:\/(?<collectionName>[^\/\?]+)))?(?:\/)?(?:\?(?<options>.*))?$/i';
-
+        $pathPattern = '/^(?:\/(?<bucketName>[^\/\?]+))(?:(?:\/(?<scopeName>[^\/]+))(?:\/(?<collectionName>[^\/\?]+)))?(?:\/)?$/';
         $newServers = [];
         $protocol = 'couchbase';
         try {
@@ -82,24 +79,24 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
                     throw new InvalidArgumentException('Invalid Couchbase DSN: it does not start with "couchbase:".');
                 }
 
-                preg_match($dsnPattern, $server, $matches);
+                $parsed = parse_url($server);
 
-                $username = $matches['username'] ?: $username;
-                $password = $matches['password'] ?: $password;
-                $protocol = $matches['protocol'] ?: $protocol;
+                $username = $parsed['user'] ?? $username;
+                $password = rawurldecode($parsed['pass'] ?? $password);
+                $protocol = $parsed['scheme'] ?? $protocol;
 
-                if (isset($matches['options'])) {
-                    $optionsInDsn = self::getOptions($matches['options']);
+                if (isset($parsed['query'])) {
+                    $optionsInDsn = self::getOptions($parsed['query']);
 
                     foreach ($optionsInDsn as $parameter => $value) {
                         $options[$parameter] = $value;
                     }
                 }
 
-                $newServers[] = $matches['host'];
+                $newServers[] = $parsed['host'];
             }
 
-            $option = isset($matches['options']) ? '?'.$matches['options'] : '';
+            $option = isset($parsed['query']) ? '?'.$parsed['query'] : '';
             $connectionString = $protocol.'://'.implode(',', $newServers).$option;
 
             $clusterOptions = new ClusterOptions();
@@ -107,6 +104,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 
             $client = new Cluster($connectionString, $clusterOptions);
 
+            preg_match($pathPattern, $parsed['path'], $matches);
             $bucket = $client->bucket($matches['bucketName']);
             $collection = $bucket->defaultCollection();
             if (!empty($matches['scopeName'])) {
@@ -122,7 +120,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 
     public static function isSupported(): bool
     {
-        return \extension_loaded('couchbase') && version_compare(phpversion('couchbase'), '3.0.5', '>=') && version_compare(phpversion('couchbase'), '4.0', '<');
+        return \extension_loaded('couchbase') && version_compare(phpversion('couchbase'), '3.0.4', '>=') && version_compare(phpversion('couchbase'), '5.0', '<');
     }
 
     private static function getOptions(string $options): array
