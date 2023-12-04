@@ -72,6 +72,7 @@ class BackedEnumValueResolverTest extends TestCase
      */
     public function testResolve(Request $request, ArgumentMetadata $metadata, $expected)
     {
+
         $resolver = new BackedEnumValueResolver();
         /** @var \Generator $results */
         $results = $resolver->resolve($request, $metadata);

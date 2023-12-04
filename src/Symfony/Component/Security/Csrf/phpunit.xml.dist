@@ -7,9 +7,12 @@
          bootstrap="vendor/autoload.php"
          failOnRisky="true"
          failOnWarning="true"
+         verbose="true"
+         convertWarningsToExceptions="true"
+         convertDeprecationsToExceptions="true"
 >
     <php>
-        <ini name="error_reporting" value="-1" />
+<!--        <ini name="error_reporting" value="-1" />-->
     </php>
 
     <testsuites>

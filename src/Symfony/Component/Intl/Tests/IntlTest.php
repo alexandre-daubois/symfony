@@ -27,8 +27,6 @@ class IntlTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         \Locale::setDefault($this->defaultLocale);
     }
 
