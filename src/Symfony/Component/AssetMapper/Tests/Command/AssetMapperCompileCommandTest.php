@@ -31,6 +31,7 @@ class AssetMapperCompileCommandTest extends TestCase
         $this->filesystem = new Filesystem();
         $this->kernel = new AssetMapperTestAppKernel('test', true);
         $this->filesystem->mkdir($this->kernel->getProjectDir().'/public');
+        $this->filesystem->mkdir($this->kernel->getProjectDir().'/var');
     }
 
     protected function tearDown(): void
