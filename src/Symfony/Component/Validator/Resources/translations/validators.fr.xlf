@@ -434,6 +434,10 @@
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
                 <target>L'encodage de caractères détecté est invalide ({{ detected }}). Les encodages autorisés sont {{ encodings }}.</target>
             </trans-unit>
+            <tran-unit id="112">
+                <source>The given string is not a valid Base64 encoded string.</source>
+                <target>La chaîne de caractères donnée n'est pas une chaîne encodée en Base64.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
