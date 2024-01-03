@@ -137,6 +137,14 @@ jobs:
           curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
           curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default -d 'memoryQuota=256'
 
+      - name: Configure Redis over TLS
+        id: redis-tls-setup
+        uses: shogo82148/actions-setup-redis@v1
+        with:
+          redis-version: "6.2"
+          redis-port: "0"
+          redis-tls-port: "16381"
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -176,6 +184,10 @@ jobs:
         run: ./phpunit --group integration -v
         env:
           REDIS_HOST: 'localhost:16379'
+          REDIS_TLS_HOST: 'localhost:16381'
+          REDIS_TLS_CERT: ${{ steps.redis-tls-dir.outputs.redis-tls-dir }}/redis.crt
+          REDIS_TLS_KEY: ${{ steps.redis-tls-dir.outputs.redis-tls-dir }}/redis.key
+          REDIS_TLS_CA: ${{ steps.redis-tls-dir.outputs.redis-tls-dir }}/ca.crt
           REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'unreachable-host:26379 localhost:26379 localhost:26379'
