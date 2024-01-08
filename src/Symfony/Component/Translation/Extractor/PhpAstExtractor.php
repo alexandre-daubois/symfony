@@ -15,6 +15,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Extractor\Visitor\AbstractVisitor;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -39,7 +40,12 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
             throw new \LogicException(sprintf('You cannot use "%s" as the "nikic/php-parser" package is not installed. Try running "composer require nikic/php-parser".', static::class));
         }
 
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $factory = new ParserFactory();
+        if (method_exists($factory, 'create')) {
+            $this->parser = $factory->create(ParserFactory::PREFER_PHP7);
+        } else {
+            $this->parser = $factory->createForVersion(PhpVersion::getHostVersion());
+        }
     }
 
     public function extract(iterable|string $resource, MessageCatalogue $catalogue): void
