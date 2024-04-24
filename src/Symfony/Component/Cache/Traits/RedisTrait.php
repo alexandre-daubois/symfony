@@ -25,6 +25,8 @@ use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Component\Uri\QueryString;
+use Symfony\Component\Uri\Uri;
 
 /**
  * @author Aurimas Niekis <aurimas@niekis.lt>
@@ -86,11 +88,8 @@ trait RedisTrait
      */
     public static function createConnection(#[\SensitiveParameter] string $dsn, array $options = []): \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|Relay
     {
-        if (str_starts_with($dsn, 'redis:')) {
-            $scheme = 'redis';
-        } elseif (str_starts_with($dsn, 'rediss:')) {
-            $scheme = 'rediss';
-        } else {
+        $dsn = Uri::parse($dsn);
+        if (!\in_array($dsn->scheme, ['redis', 'rediss'], true)) {
             throw new InvalidArgumentException('Invalid Redis DSN: it does not start with "redis[s]:".');
         }
 
@@ -98,68 +97,58 @@ trait RedisTrait
             throw new CacheException('Cannot find the "redis" extension nor the "predis/predis" package.');
         }
 
-        $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
-            if (isset($m['password'])) {
-                if (\in_array($m['user'], ['', 'default'], true)) {
-                    $auth = rawurldecode($m['password']);
-                } else {
-                    $auth = [rawurldecode($m['user']), rawurldecode($m['password'])];
-                }
-
-                if ('' === $auth) {
-                    $auth = null;
-                }
-            }
-
-            return 'file:'.($m[1] ?? '');
-        }, $dsn);
-
-        if (false === $params = parse_url($params)) {
-            throw new InvalidArgumentException('Invalid Redis DSN.');
-        }
-
-        $query = $hosts = [];
-
-        $tls = 'rediss' === $scheme;
+        $hosts = [];
+        $query = $dsn->query?->all() ?? [];
+        $tls = 'rediss' === $dsn->scheme;
         $tcpScheme = $tls ? 'tls' : 'tcp';
 
-        if (isset($params['query'])) {
-            parse_str($params['query'], $query);
+        $auth = null;
+        if ($dsn->password) {
+            $auth = [$dsn->password];
+        }
 
-            if (isset($query['host'])) {
-                if (!\is_array($hosts = $query['host'])) {
+        if ($dsn->user) {
+            $auth ??= [];
+            array_unshift($auth, $dsn->user);
+        }
+
+        if (null !== $dsn->query) {
+            $queryString = $dsn->query;
+            if ($queryString->has('host')) {
+                if (!\is_array($hosts = $queryString->get('host'))) {
                     throw new InvalidArgumentException('Invalid Redis DSN: query parameter "host" must be an array.');
                 }
+
                 foreach ($hosts as $host => $parameters) {
                     if (\is_string($parameters)) {
-                        parse_str($parameters, $parameters);
+                        $parameters = QueryString::parse($parameters);
                     }
                     if (false === $i = strrpos($host, ':')) {
-                        $hosts[$host] = ['scheme' => $tcpScheme, 'host' => $host, 'port' => 6379] + $parameters;
+                        $hosts[$host] = ['scheme' => $tcpScheme, 'host' => $host, 'port' => 6379] + $parameters->all();
                     } elseif ($port = (int) substr($host, 1 + $i)) {
-                        $hosts[$host] = ['scheme' => $tcpScheme, 'host' => substr($host, 0, $i), 'port' => $port] + $parameters;
+                        $hosts[$host] = ['scheme' => $tcpScheme, 'host' => substr($host, 0, $i), 'port' => $port] + $parameters->all();
                     } else {
-                        $hosts[$host] = ['scheme' => 'unix', 'path' => substr($host, 0, $i)] + $parameters;
+                        $hosts[$host] = ['scheme' => 'unix', 'path' => substr($host, 0, $i)] + $parameters->all();
                     }
                 }
                 $hosts = array_values($hosts);
             }
         }
 
-        if (isset($params['host']) || isset($params['path'])) {
-            if (!isset($params['dbindex']) && isset($params['path'])) {
-                if (preg_match('#/(\d+)?$#', $params['path'], $m)) {
-                    $params['dbindex'] = $m[1] ?? '0';
-                    $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
-                } elseif (isset($params['host'])) {
+        if ($dsn->host || $dsn->path) {
+            if (!$dsn->query?->has('dbindex') && $dsn->path) {
+                if (preg_match('#/(\d+)?$#', $dsn->path, $m)) {
+                    $query['dbindex'] = $m[1] ?? '0';
+                    $dsn->path = substr($dsn->path, 0, -\strlen($m[0]));
+                } elseif ($dsn->host) {
                     throw new InvalidArgumentException('Invalid Redis DSN: query parameter "dbindex" must be a number.');
                 }
             }
 
-            if (isset($params['host'])) {
-                array_unshift($hosts, ['scheme' => $tcpScheme, 'host' => $params['host'], 'port' => $params['port'] ?? 6379]);
+            if ($dsn->host) {
+                array_unshift($hosts, ['scheme' => $tcpScheme, 'host' => $dsn->host, 'port' => $dsn->port ?? 6379]);
             } else {
-                array_unshift($hosts, ['scheme' => 'unix', 'path' => $params['path']]);
+                array_unshift($hosts, ['scheme' => 'unix', 'path' => $dsn->path]);
             }
         }
 
@@ -167,7 +156,7 @@ trait RedisTrait
             throw new InvalidArgumentException('Invalid Redis DSN: missing host.');
         }
 
-        $params += $query + $options + self::$defaultConnectionOptions;
+        $params = $query + $options + self::$defaultConnectionOptions;
 
         if (isset($params['redis_sentinel']) && isset($params['sentinel_master'])) {
             throw new InvalidArgumentException('Cannot use both "redis_sentinel" and "sentinel_master" at the same time.');
