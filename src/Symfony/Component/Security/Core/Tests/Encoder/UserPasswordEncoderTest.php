@@ -82,11 +82,14 @@ class UserPasswordEncoderTest extends TestCase
         $user = new User('username', null);
         $encoder = new NativePasswordEncoder(4, 20000, 4);
 
+        $expected = [$encoder, $encoder, new NativePasswordEncoder(5, 20000, 5), $encoder];
         $mockEncoderFactory = $this->createMock(EncoderFactoryInterface::class);
         $mockEncoderFactory->expects($this->any())
             ->method('getEncoder')
             ->with($user)
-            ->will($this->onConsecutiveCalls($encoder, $encoder, new NativePasswordEncoder(5, 20000, 5), $encoder));
+            ->willReturnCallback(function () use (&$expected) {
+                return array_shift($expected);
+            });
 
         $passwordEncoder = new UserPasswordEncoder($mockEncoderFactory);
 

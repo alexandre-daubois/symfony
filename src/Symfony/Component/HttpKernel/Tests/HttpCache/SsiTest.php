@@ -201,7 +201,9 @@ class SsiTest extends TestCase
         if (\is_array($response)) {
             $cache->expects($this->any())
                   ->method('handle')
-                  ->will($this->onConsecutiveCalls(...$response))
+                  ->willReturnCallback(function () use (&$response) {
+                      return array_shift($response);
+                  })
             ;
         } else {
             $cache->expects($this->any())

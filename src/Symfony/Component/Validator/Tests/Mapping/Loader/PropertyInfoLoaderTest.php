@@ -54,39 +54,47 @@ class PropertyInfoLoaderTest extends TestCase
                 'noAutoMapping',
             ])
         ;
+
+        $expectedTypes = [
+            [new Type(Type::BUILTIN_TYPE_STRING, true)],
+            [new Type(Type::BUILTIN_TYPE_STRING)],
+            [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_BOOL)],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, true, Entity::class)],
+            [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Entity::class))],
+            [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)],
+            [new Type(Type::BUILTIN_TYPE_FLOAT, true)], // The existing constraint is float
+            [new Type(Type::BUILTIN_TYPE_STRING, true)],
+            [new Type(Type::BUILTIN_TYPE_STRING, true)],
+            [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_FLOAT))],
+            [new Type(Type::BUILTIN_TYPE_STRING)],
+            [new Type(Type::BUILTIN_TYPE_STRING)],
+        ];
         $propertyInfoStub
             ->method('getTypes')
-            ->will($this->onConsecutiveCalls(
-                [new Type(Type::BUILTIN_TYPE_STRING, true)],
-                [new Type(Type::BUILTIN_TYPE_STRING)],
-                [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_BOOL)],
-                [new Type(Type::BUILTIN_TYPE_OBJECT, true, Entity::class)],
-                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Entity::class))],
-                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)],
-                [new Type(Type::BUILTIN_TYPE_FLOAT, true)], // The existing constraint is float
-                [new Type(Type::BUILTIN_TYPE_STRING, true)],
-                [new Type(Type::BUILTIN_TYPE_STRING, true)],
-                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_FLOAT))],
-                [new Type(Type::BUILTIN_TYPE_STRING)],
-                [new Type(Type::BUILTIN_TYPE_STRING)]
-            ))
+            ->willReturnCallback(function () use (&$expectedTypes) {
+                return array_shift($expectedTypes);
+            })
         ;
+
+        $expectedWritable = [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+        ];
         $propertyInfoStub
             ->method('isWritable')
-            ->will($this->onConsecutiveCalls(
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                false,
-                true
-            ))
+            ->willReturnCallback(function () use (&$expectedWritable) {
+                return array_shift($expectedWritable);
+            })
         ;
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
@@ -222,12 +230,16 @@ class PropertyInfoLoaderTest extends TestCase
             ->method('getProperties')
             ->willReturn(['string', 'autoMappingExplicitlyEnabled'])
         ;
+
+        $expectedTypes = [
+            [new Type(Type::BUILTIN_TYPE_STRING)],
+            [new Type(Type::BUILTIN_TYPE_STRING)],
+        ];
         $propertyInfoStub
             ->method('getTypes')
-            ->willReturnOnConsecutiveCalls(
-                [new Type(Type::BUILTIN_TYPE_STRING)],
-                [new Type(Type::BUILTIN_TYPE_BOOL)]
-            );
+            ->willReturnCallback(function () use (&$expectedTypes) {
+                return array_shift($expectedTypes);
+            });
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
         $validator = Validation::createValidatorBuilder()

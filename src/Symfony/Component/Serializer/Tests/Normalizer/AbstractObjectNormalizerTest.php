@@ -170,12 +170,15 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private function getDenormalizerForDummyCollection()
     {
+        $expected = [
+            [new Type('array', false, null, true, new Type('int'), new Type('object', false, DummyChild::class))],
+            null,
+        ];
         $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
-                [new Type('array', false, null, true, new Type('int'), new Type('object', false, DummyChild::class))],
-                null
-            ));
+            ->willReturnCallback(function () use (&$expected) {
+                return array_shift($expected);
+            });
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -225,12 +228,15 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private function getDenormalizerForStringCollection()
     {
+        $expected = [
+            [new Type('array', false, null, true, new Type('int'), new Type('string'))],
+            null,
+        ];
         $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
-                [new Type('array', false, null, true, new Type('int'), new Type('string'))],
-                null
-            ));
+            ->willReturnCallback(function () use (&$expected) {
+                return array_shift($expected);
+            });
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -415,22 +421,26 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private function getDenormalizerForObjectWithBasicProperties()
     {
+        $expected = [
+            [new Type('bool')],
+            [new Type('bool')],
+            [new Type('bool')],
+            [new Type('bool')],
+            [new Type('int')],
+            [new Type('int')],
+            [new Type('float')],
+            [new Type('float')],
+            [new Type('float')],
+            [new Type('float')],
+            [new Type('float')],
+            [new Type('float')],
+        ];
+
         $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
-                [new Type('bool')],
-                [new Type('bool')],
-                [new Type('bool')],
-                [new Type('bool')],
-                [new Type('int')],
-                [new Type('int')],
-                [new Type('float')],
-                [new Type('float')],
-                [new Type('float')],
-                [new Type('float')],
-                [new Type('float')],
-                [new Type('float')]
-            ));
+            ->willReturnCallback(function () use (&$expected) {
+                return array_shift($expected);
+            });
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -663,8 +673,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeXmlScalar()
     {
-        $normalizer = new class () extends AbstractObjectNormalizer
-        {
+        $normalizer = new class() extends AbstractObjectNormalizer {
             public function __construct()
             {
                 parent::__construct(null, new MetadataAwareNameConverter(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))));

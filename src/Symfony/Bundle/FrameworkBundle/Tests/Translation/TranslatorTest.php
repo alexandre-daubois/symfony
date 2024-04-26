@@ -267,35 +267,39 @@ class TranslatorTest extends TestCase
 
     protected function getLoader()
     {
+        $expected = [
+            $this->getCatalogue('fr', [
+                'foo' => 'foo (FR)',
+            ]),
+            $this->getCatalogue('en', [
+                'foo' => 'foo (EN)',
+                'bar' => 'bar (EN)',
+                'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
+            ]),
+            $this->getCatalogue('es', [
+                'foobar' => 'foobar (ES)',
+            ]),
+            $this->getCatalogue('pt-PT', [
+                'foobarfoo' => 'foobarfoo (PT-PT)',
+            ]),
+            $this->getCatalogue('pt_BR', [
+                'other choice' => '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
+            ]),
+            $this->getCatalogue('fr.UTF-8', [
+                'foobarbaz' => 'foobarbaz (fr.UTF-8)',
+            ]),
+            $this->getCatalogue('sr@latin', [
+                'foobarbax' => 'foobarbax (sr@latin)',
+            ]),
+        ];
+
         $loader = $this->createMock(LoaderInterface::class);
         $loader
             ->expects($this->exactly(7))
             ->method('load')
-            ->willReturnOnConsecutiveCalls(
-                $this->getCatalogue('fr', [
-                    'foo' => 'foo (FR)',
-                ]),
-                $this->getCatalogue('en', [
-                    'foo' => 'foo (EN)',
-                    'bar' => 'bar (EN)',
-                    'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
-                ]),
-                $this->getCatalogue('es', [
-                    'foobar' => 'foobar (ES)',
-                ]),
-                $this->getCatalogue('pt-PT', [
-                    'foobarfoo' => 'foobarfoo (PT-PT)',
-                ]),
-                $this->getCatalogue('pt_BR', [
-                    'other choice' => '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
-                ]),
-                $this->getCatalogue('fr.UTF-8', [
-                    'foobarbaz' => 'foobarbaz (fr.UTF-8)',
-                ]),
-                $this->getCatalogue('sr@latin', [
-                    'foobarbax' => 'foobarbax (sr@latin)',
-                ])
-            )
+            ->willReturnCallback(function () use (&$expected) {
+                return array_shift($expected);
+            })
         ;
 
         return $loader;

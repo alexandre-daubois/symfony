@@ -45,7 +45,11 @@ class SessionListenerTest extends TestCase
     public function testSessionCookieOptions(array $phpSessionOptions, array $sessionOptions, array $expectedSessionOptions)
     {
         $session = $this->createMock(Session::class);
-        $session->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
         $session->method('getId')->willReturn('123456');
         $session->method('getName')->willReturn('PHPSESSID');
         $session->method('save');
@@ -398,7 +402,11 @@ class SessionListenerTest extends TestCase
     public function testResponseIsPrivateIfSessionStarted()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
 
         $container = new Container();
         $container->set('initialized_session', $session);
@@ -423,7 +431,11 @@ class SessionListenerTest extends TestCase
     public function testResponseIsStillPublicIfSessionStartedAndHeaderPresent()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
 
         $container = new Container();
         $container->set('initialized_session', $session);
@@ -450,7 +462,11 @@ class SessionListenerTest extends TestCase
     public function testSessionSaveAndResponseHasSessionCookie()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
         $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
         $session->expects($this->exactly(1))->method('save');
@@ -535,7 +551,11 @@ class SessionListenerTest extends TestCase
     public function testResponseHeadersMaxAgeAndExpiresNotBeOverridenIfSessionStarted()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
 
         $container = new Container();
         $container->set('initialized_session', $session);
@@ -565,7 +585,11 @@ class SessionListenerTest extends TestCase
     public function testResponseHeadersMaxAgeAndExpiresDefaultValuesIfSessionStarted()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
 
         $container = new Container();
         $container->set('initialized_session', $session);
@@ -618,7 +642,11 @@ class SessionListenerTest extends TestCase
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
-        $session->expects($this->exactly(4))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1, 1, 1));
+        $session->expects($this->exactly(4))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1, 1, 1];
+
+            return array_shift($expected);
+        });
 
         $container = new Container();
         $container->set('initialized_session', $session);
@@ -715,7 +743,11 @@ class SessionListenerTest extends TestCase
     public function testSessionUsageExceptionIfStatelessAndSessionUsed()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
 
         $container = new Container();
         $container->set('initialized_session', $session);
@@ -734,7 +766,11 @@ class SessionListenerTest extends TestCase
     public function testSessionUsageLogIfStatelessAndSessionUsed()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->exactly(1))->method('warning');
@@ -759,7 +795,11 @@ class SessionListenerTest extends TestCase
         $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
         $session->method('isStarted')->willReturn(true);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturnCallback(function () {
+            static $expected = [0, 1];
+
+            return array_shift($expected);
+        });
         $session->expects($this->exactly(1))->method('save');
 
         $container = new Container();

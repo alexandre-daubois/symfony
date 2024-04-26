@@ -25,13 +25,19 @@ class FileLoaderTest extends TestCase
         $locatorMock = $this->createMock(FileLocatorInterface::class);
 
         $locatorMockForAdditionalLoader = $this->createMock(FileLocatorInterface::class);
-        $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
-            ['path/to/file1'],                    // Default
-            ['path/to/file1', 'path/to/file2'],   // First is imported
-            ['path/to/file1', 'path/to/file2'],   // Second is imported
-            ['path/to/file1'],                    // Exception
-            ['path/to/file1', 'path/to/file2']    // Exception
-        ));
+        $locatorMockForAdditionalLoader->expects($this->any())
+            ->method('locate')
+            ->willReturnCallback(function () {
+                static $expected = [
+                    ['path/to/file1'],
+                    ['path/to/file1', 'path/to/file2'],
+                    ['path/to/file1', 'path/to/file2'],
+                    ['path/to/file1'],
+                    ['path/to/file1', 'path/to/file2'],
+                ];
+
+                return array_shift($expected);
+            });
 
         $fileLoader = new TestFileLoader($locatorMock);
         $fileLoader->setSupports(false);
