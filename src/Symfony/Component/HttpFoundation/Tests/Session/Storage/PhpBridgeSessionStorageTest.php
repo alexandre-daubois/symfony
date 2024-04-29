@@ -30,10 +30,14 @@ class PhpBridgeSessionStorageTest extends TestCase
 {
     private $savePath;
 
+    private $sessionSaveHandler;
+    private $sessionSavePath;
+
     protected function setUp(): void
     {
-        $this->iniSet('session.save_handler', 'files');
-        $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sftest');
+        $this->sessionSaveHandler = ini_set('session.save_handler', 'files');
+        $this->sessionSavePath = ini_set('session.save_path', $this->savePath = sys_get_temp_dir().'/sftest');
+
         if (!is_dir($this->savePath)) {
             mkdir($this->savePath);
         }
@@ -48,6 +52,8 @@ class PhpBridgeSessionStorageTest extends TestCase
         }
 
         $this->savePath = null;
+        ini_set('session.save_handler', $this->sessionSaveHandler);
+        ini_set('session.save_path', $this->sessionSavePath);
     }
 
     protected function getStorage(): PhpBridgeSessionStorage

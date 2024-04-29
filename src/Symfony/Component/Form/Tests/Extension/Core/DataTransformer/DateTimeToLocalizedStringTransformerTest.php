@@ -25,14 +25,17 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
     protected $dateTimeWithoutSeconds;
     private $defaultLocale;
 
+    private $testCaseUseException;
+    private $testCaseErrorLevel;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         // Normalize intl. configuration settings.
         if (\extension_loaded('intl')) {
-            $this->iniSet('intl.use_exceptions', 0);
-            $this->iniSet('intl.error_level', 0);
+            $this->testCaseUseException = ini_set('intl.use_exceptions', 0);
+            $this->testCaseErrorLevel = ini_set('intl.error_level', 0);
         }
 
         // Since we test against "de_AT", we need the full implementation
@@ -50,6 +53,11 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;
         \Locale::setDefault($this->defaultLocale);
+
+        if (\extension_loaded('intl')) {
+            ini_set('intl.use_exceptions', $this->testCaseUseException);
+            ini_set('intl.error_level', $this->testCaseUseException);
+        }
     }
 
     public static function dataProvider()
@@ -339,11 +347,13 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
             $this->markTestSkipped('intl extension is not loaded');
         }
 
-        $this->iniSet('intl.error_level', \E_WARNING);
+        $errorLevel = ini_set('intl.error_level', \E_WARNING);
 
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToLocalizedStringTransformer();
         $transformer->reverseTransform('12345');
+
+        ini_set('intl.error_level', $errorLevel);
     }
 
     public function testReverseTransformWrapsIntlErrorsWithExceptions()
@@ -352,11 +362,13 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
             $this->markTestSkipped('intl extension is not loaded');
         }
 
-        $this->iniSet('intl.use_exceptions', 1);
+        $useException = ini_set('intl.use_exceptions', 1);
 
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToLocalizedStringTransformer();
         $transformer->reverseTransform('12345');
+
+        ini_set('intl.use_exceptions', $useException);
     }
 
     public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
@@ -365,12 +377,15 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
             $this->markTestSkipped('intl extension is not loaded');
         }
 
-        $this->iniSet('intl.use_exceptions', 1);
-        $this->iniSet('intl.error_level', \E_WARNING);
+        $useExceptions = ini_set('intl.use_exceptions', 1);
+        $errorLevel = ini_set('intl.error_level', \E_WARNING);
 
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToLocalizedStringTransformer();
         $transformer->reverseTransform('12345');
+
+        ini_set('intl.use_exceptions', $useExceptions);
+        ini_set('intl.error_level', $errorLevel);
     }
 
     protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer
