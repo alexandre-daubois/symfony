@@ -54,7 +54,7 @@ class ErrorListenerTest extends TestCase
      */
     public function testHandleWithoutLogger($event, $event2)
     {
-        $this->iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
+        $initialErrorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
         $l = new ErrorListener('foo');
         $l->logKernelException($event);
@@ -70,6 +70,8 @@ class ErrorListenerTest extends TestCase
             $this->assertSame('bar', $e->getMessage());
             $this->assertSame('foo', $e->getPrevious()->getMessage());
         }
+
+        ini_set('error_log', $initialErrorLog);
     }
 
     /**

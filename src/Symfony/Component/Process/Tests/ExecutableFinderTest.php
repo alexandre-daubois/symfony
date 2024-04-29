@@ -109,12 +109,14 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        $this->iniSet('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
+        $initialOpenBaseDir = ini_set('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
 
         $this->assertSamePath(\PHP_BINARY, $result);
+
+        ini_set('open_basedir', $initialOpenBaseDir);
     }
 
     /**
@@ -130,12 +132,15 @@ class ExecutableFinderTest extends TestCase
         }
 
         $this->setPath('');
-        $this->iniSet('open_basedir', \PHP_BINARY.\PATH_SEPARATOR.'/');
+
+        $initialOpenBaseDir = ini_set('open_basedir', \PHP_BINARY.\PATH_SEPARATOR.'/');
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), false);
 
         $this->assertSamePath(\PHP_BINARY, $result);
+
+        ini_set('open_basedir', $initialOpenBaseDir);
     }
 
     public function testFindBatchExecutableOnWindows()

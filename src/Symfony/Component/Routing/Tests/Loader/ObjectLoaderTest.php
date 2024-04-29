@@ -81,9 +81,8 @@ class ObjectLoaderTest extends TestCase
     public function testExceptionOnMethodNotReturningCollection()
     {
         $this->expectException(\LogicException::class);
-        $service = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['loadRoutes'])
-            ->getMock();
+
+        $service = $this->createMock(stdClassWithLoadRoutesMethod::class);
         $service->expects($this->once())
             ->method('loadRoutes')
             ->willReturn('NOT_A_COLLECTION');
@@ -106,6 +105,13 @@ class TestObjectLoader extends ObjectLoader
     protected function getObject(string $id): object
     {
         return $this->loaderMap[$id] ?? null;
+    }
+}
+
+class stdClassWithLoadRoutesMethod extends \stdClass
+{
+    public function loadRoutes()
+    {
     }
 }
 
