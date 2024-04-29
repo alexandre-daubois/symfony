@@ -66,7 +66,7 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COLUMNS=120 >> $GITHUB_ENV
-          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data,integration" >> $GITHUB_ENV
+          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group integration" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi'$([[ "${{ matrix.mode }}" != low-deps ]] && echo ' --ignore-platform-req=php+') >> $GITHUB_ENV
           echo SYMFONY_DEPRECATIONS_HELPER="baselineFile=$(pwd)/.github/deprecations-baseline.json" >> $GITHUB_ENV
 
