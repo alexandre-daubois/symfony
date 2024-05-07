@@ -98,6 +98,13 @@ class NativePasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword));
     }
 
+    /**
+     * "password_hash()" does not accept passwords containing NUL bytes prior to PHP 8.2
+     * and throws a ValueError, thus this test is skipped because `$hasher->verify()` will
+     * not be executed.
+     *
+     * @requires PHP >= 8.2
+     */
     public function testBcryptWithNulByte()
     {
         $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);

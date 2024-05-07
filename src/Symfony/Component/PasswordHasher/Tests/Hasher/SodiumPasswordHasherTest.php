@@ -73,6 +73,13 @@ class SodiumPasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT))->hash($plainPassword), $plainPassword));
     }
 
+    /**
+     * "password_hash()" does not accept passwords containing NUL bytes prior to PHP 8.2
+     * and throws a ValueError, thus this test is skipped because `$hasher->verify()` will
+     * not be executed.
+     *
+     * @requires PHP >= 8.2
+     */
     public function testBcryptWithNulByte()
     {
         $hasher = new SodiumPasswordHasher(null, null);
