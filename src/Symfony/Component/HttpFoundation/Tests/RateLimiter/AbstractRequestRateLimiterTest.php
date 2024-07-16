@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests\RateLimiter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\Policy\NoLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 
 class AbstractRequestRateLimiterTest extends TestCase
@@ -31,6 +32,27 @@ class AbstractRequestRateLimiterTest extends TestCase
         }, $rateLimits));
 
         $this->assertSame($expected, $rateLimiter->consume(new Request()));
+    }
+
+    public function testConsumeWithoutLimiterAddsSpecialNoLimiter()
+    {
+        dump(__METHOD__, ($nl = new NoLimiter()), PHP_INT_MAX, new RateLimit(PHP_INT_MAX, new \DateTimeImmutable(), true, PHP_INT_MAX), $nl->consume());
+        $rateLimiter = new MockAbstractRequestRateLimiter([]);
+
+        $this->assertSame(\PHP_INT_MAX, $rateLimiter->consume(new Request())->getLimit());
+    }
+
+    public function testResetLimiters()
+    {
+        $rateLimiter = new MockAbstractRequestRateLimiter([
+            $limiter1 = $this->createMock(LimiterInterface::class),
+            $limiter2 = $this->createMock(LimiterInterface::class),
+        ]);
+
+        $limiter1->expects($this->once())->method('reset');
+        $limiter2->expects($this->once())->method('reset');
+
+        $rateLimiter->reset(new Request());
     }
 
     public static function provideRateLimits()
