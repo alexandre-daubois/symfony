@@ -33,7 +33,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     private Request $request;
     private ?ResponseCacheStrategyInterface $surrogateCacheStrategy = null;
-    private array $options = [];
+    private array $options;
     private array $traces = [];
 
     /**

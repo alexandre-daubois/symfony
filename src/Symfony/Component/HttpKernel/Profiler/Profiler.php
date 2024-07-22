@@ -31,7 +31,7 @@ class Profiler implements ResetInterface
      */
     private array $collectors = [];
 
-    private bool $initiallyEnabled = true;
+    private bool $initiallyEnabled;
 
     public function __construct(
         private ProfilerStorageInterface $storage,

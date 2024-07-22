@@ -29,7 +29,7 @@ class StreamedResponse extends Response
     protected ?\Closure $callback = null;
     protected bool $streamed = false;
 
-    private bool $headersSent = false;
+    private bool $headersSent;
 
     /**
      * @param int $status The HTTP status code (200 "OK" by default)

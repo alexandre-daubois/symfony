@@ -60,7 +60,7 @@ final class CharacterStream
     private array $map = [];
     private int $charCount = 0;
     private int $currentPos = 0;
-    private int $fixedWidth = 0;
+    private int $fixedWidth;
 
     /**
      * @param resource|string $input

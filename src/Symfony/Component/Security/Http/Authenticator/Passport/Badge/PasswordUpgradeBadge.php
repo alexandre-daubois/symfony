@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class PasswordUpgradeBadge implements BadgeInterface
 {
-    private ?string $plaintextPassword = null;
+    private ?string $plaintextPassword;
 
     /**
      * @param string                         $plaintextPassword The presented password, used in the rehash

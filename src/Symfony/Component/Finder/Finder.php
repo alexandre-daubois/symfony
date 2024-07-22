@@ -56,7 +56,7 @@ class Finder implements \IteratorAggregate, \Countable
     private bool $followLinks = false;
     private bool $reverseSorting = false;
     private \Closure|int|false $sort = false;
-    private int $ignore = 0;
+    private int $ignore;
     private array $dirs = [];
     private array $dates = [];
     private array $iterators = [];

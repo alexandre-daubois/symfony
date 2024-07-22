@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Exception\LogicException;
  */
 class PasswordCredentials implements CredentialsInterface
 {
-    private ?string $password = null;
+    private ?string $password;
     private bool $resolved = false;
 
     public function __construct(#[\SensitiveParameter] string $password)

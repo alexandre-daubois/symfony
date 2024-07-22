@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RequestContext;
  */
 class CompiledUrlGenerator extends UrlGenerator
 {
-    private array $compiledRoutes = [];
+    private array $compiledRoutes;
 
     public function __construct(
         array $compiledRoutes,

@@ -35,7 +35,7 @@ class Deprecation
     public const TYPE_INDIRECT = 'type_indirect';
     public const TYPE_UNDETERMINED = 'type_undetermined';
 
-    private $trace = [];
+    private $trace;
     private $message;
     private $languageDeprecation;
     private $originClass;

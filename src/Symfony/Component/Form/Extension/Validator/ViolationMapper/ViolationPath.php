@@ -27,7 +27,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     private array $isIndex = [];
     private array $mapsForm = [];
     private string $pathAsString = '';
-    private int $length = 0;
+    private int $length;
 
     /**
      * Creates a new violation path from a string.

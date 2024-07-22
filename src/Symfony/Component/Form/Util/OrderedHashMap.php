@@ -76,7 +76,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @var list<string>
      */
-    private array $orderedKeys = [];
+    private array $orderedKeys;
 
     /**
      * References to the cursors of all open iterators.

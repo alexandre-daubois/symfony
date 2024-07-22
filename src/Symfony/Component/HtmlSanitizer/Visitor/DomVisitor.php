@@ -34,7 +34,7 @@ use Symfony\Component\HtmlSanitizer\Visitor\Node\TextNode;
  */
 final class DomVisitor
 {
-    private HtmlSanitizerAction $defaultAction = HtmlSanitizerAction::Drop;
+    private HtmlSanitizerAction $defaultAction;
 
     /**
      * Registry of attributes to forcefully set on nodes, index by element and attribute.

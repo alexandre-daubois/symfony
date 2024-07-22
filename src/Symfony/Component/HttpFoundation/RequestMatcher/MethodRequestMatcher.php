@@ -24,7 +24,7 @@ class MethodRequestMatcher implements RequestMatcherInterface
     /**
      * @var string[]
      */
-    private array $methods = [];
+    private array $methods;
 
     /**
      * @param string[]|string $methods An HTTP method or an array of HTTP methods

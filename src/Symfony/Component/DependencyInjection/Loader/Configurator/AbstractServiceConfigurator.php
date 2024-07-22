@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 abstract class AbstractServiceConfigurator extends AbstractConfigurator
 {
-    private array $defaultTags = [];
+    private array $defaultTags;
 
     public function __construct(
         protected ServicesConfigurator $parent,
