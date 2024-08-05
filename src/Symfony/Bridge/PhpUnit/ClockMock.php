@@ -72,7 +72,7 @@ class ClockMock
             return self::$now;
         }
 
-        return sprintf('%0.6f00 %d', self::$now - (int) self::$now, (int) self::$now);
+        return \sprintf('%0.6f00 %d', self::$now - (int) self::$now, (int) self::$now);
     }
 
     public static function date($format, $timestamp = null): string
@@ -100,12 +100,12 @@ class ClockMock
     {
         $ns = (self::$now - (int) self::$now) * 1000000000;
 
+
         if ($asNumber) {
-            $number = sprintf('%d%d', (int) self::$now, $ns);
+            $number = \sprintf('%d%d', (int) self::$now, $ns);
 
             return \PHP_INT_SIZE === 8 ? (int) $number : (float) $number;
         }
-
         return [(int) self::$now, (int) $ns];
     }
 
