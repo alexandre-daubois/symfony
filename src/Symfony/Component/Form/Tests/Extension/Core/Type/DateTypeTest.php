@@ -1156,6 +1156,62 @@ class DateTypeTest extends BaseTypeTestCase
         ]);
     }
 
+    public function testSubmitWithCustomCalendarOption()
+    {
+        $calendar = \IntlCalendar::createInstance();
+        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
+
+        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar($calendar));
+        $form->submit('2024-03-31 2024w14');
+
+        $this->assertSame('2024', $form->getData()['year']);
+        $this->assertSame('31', $form->getData()['day']);
+        $this->assertSame('3', $form->getData()['month']);
+
+        $this->assertSame('2024-03-31 2024w14', $form->getViewData());
+
+        $calendar = \IntlCalendar::createInstance();
+        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+
+        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar($calendar));
+        $form->submit('2024-03-31 2024w13');
+
+        $this->assertSame('2024', $form->getData()['year']);
+        $this->assertSame('31', $form->getData()['day']);
+        $this->assertSame('3', $form->getData()['month']);
+
+        $this->assertSame('2024-03-31 2024w13', $form->getViewData());
+    }
+
+    public function testSetDataWithCustomCalendarOption()
+    {
+        $calendar = \IntlCalendar::createInstance();
+        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
+
+        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar($calendar));
+        $form->setData(['year' => '2024', 'month' => '3', 'day' => '31']);
+
+        $this->assertSame('2024-03-31 2024w14', $form->getViewData());
+
+        $calendar = \IntlCalendar::createInstance();
+        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+
+        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar($calendar));
+        $form->setData(['year' => '2024', 'month' => '3', 'day' => '31']);
+
+        $this->assertSame('2024-03-31 2024w13', $form->getViewData());
+    }
+
+    private static function getFormOptionsWithCalendar(\IntlCalendar $calendar): array
+    {
+        return [
+            'format' => "y-MM-dd y'w'w",
+            'html5' => false,
+            'input' => 'array',
+            'calendar' => $calendar,
+        ];
+    }
+
     protected function getTestOptions(): array
     {
         return ['widget' => 'choice'];
