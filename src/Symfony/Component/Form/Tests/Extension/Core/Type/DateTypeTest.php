@@ -1156,59 +1156,48 @@ class DateTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testSubmitWithCustomCalendarOption()
+    public function testSubmitWithCustomLocaleOption()
     {
-        $calendar = \IntlCalendar::createInstance();
-        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
-
-        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar($calendar));
+        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar('fr_FR', \IntlDateFormatter::GREGORIAN));
         $form->submit('2024-03-31 2024w14');
 
         $this->assertSame('2024', $form->getData()['year']);
         $this->assertSame('31', $form->getData()['day']);
         $this->assertSame('3', $form->getData()['month']);
 
-        $this->assertSame('2024-03-31 2024w14', $form->getViewData());
+        $this->assertSame('2024-03-31 2024w13', $form->getViewData());
 
-        $calendar = \IntlCalendar::createInstance();
-        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
-
-        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar($calendar));
-        $form->submit('2024-03-31 2024w13');
+        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar('zh_TW@calendar=roc', \IntlDateFormatter::TRADITIONAL));
+        $form->submit('113-03-31 113w13');
 
         $this->assertSame('2024', $form->getData()['year']);
         $this->assertSame('31', $form->getData()['day']);
         $this->assertSame('3', $form->getData()['month']);
 
-        $this->assertSame('2024-03-31 2024w13', $form->getViewData());
+        $this->assertSame('113-03-31 113w14', $form->getViewData());
     }
 
-    public function testSetDataWithCustomCalendarOption()
+    public function testSetDataWithCustomLocaleOption()
     {
-        $calendar = \IntlCalendar::createInstance();
-        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
-
-        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar($calendar));
-        $form->setData(['year' => '2024', 'month' => '3', 'day' => '31']);
-
-        $this->assertSame('2024-03-31 2024w14', $form->getViewData());
-
-        $calendar = \IntlCalendar::createInstance();
-        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
-
-        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar($calendar));
+        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar('fr_FR', \IntlDateFormatter::GREGORIAN));
         $form->setData(['year' => '2024', 'month' => '3', 'day' => '31']);
 
         $this->assertSame('2024-03-31 2024w13', $form->getViewData());
+
+        $form = $this->factory->create(static::TESTED_TYPE, options: self::getFormOptionsWithCalendar('zh_TW@calendar=roc', \IntlDateFormatter::TRADITIONAL));
+        $form->setData(['year' => '2024', 'month' => '3', 'day' => '31']);
+
+        $this->assertSame('113-03-31 113w14', $form->getViewData());
     }
 
-    private static function getFormOptionsWithCalendar(\IntlCalendar $calendar): array
+    private static function getFormOptionsWithCalendar(string $locale, int $calendar): array
     {
         return [
             'format' => "y-MM-dd y'w'w",
             'html5' => false,
             'input' => 'array',
             'calendar' => $calendar,
+            'locale' => $locale,
         ];
     }
 

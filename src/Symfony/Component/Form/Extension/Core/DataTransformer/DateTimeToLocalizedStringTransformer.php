@@ -36,6 +36,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @param int|null    $timeFormat     The time format
      * @param int         $calendar       One of the \IntlDateFormatter calendar constants
      * @param string|null $pattern        A pattern to pass to \IntlDateFormatter
+     * @param string|null $locale         The locale to use for the formatter
      *
      * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
      */
@@ -44,8 +45,9 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         ?string $outputTimezone = null,
         ?int $dateFormat = null,
         ?int $timeFormat = null,
-        private int|\IntlCalendar $calendar = \IntlDateFormatter::GREGORIAN,
+        private int $calendar = \IntlDateFormatter::GREGORIAN,
         private ?string $pattern = null,
+        private ?string $locale = null,
     ) {
         parent::__construct($inputTimezone, $outputTimezone);
 
@@ -169,7 +171,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $calendar = $this->calendar;
         $pattern = $this->pattern;
 
-        $intlDateFormatter = new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern ?? '');
+        $intlDateFormatter = new \IntlDateFormatter($this->locale ?? \Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern ?? '');
 
         // new \intlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/66323
         if (!$intlDateFormatter) {

@@ -51,6 +51,7 @@ class DateType extends AbstractType
         $timeFormat = \IntlDateFormatter::NONE;
         $calendar = $options['calendar'] ?? \IntlDateFormatter::GREGORIAN;
         $pattern = \is_string($options['format']) ? $options['format'] : '';
+        $locale = $options['locale'] ?? null;
 
         if (!\in_array($dateFormat, self::ACCEPTED_FORMATS, true)) {
             throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
@@ -67,7 +68,8 @@ class DateType extends AbstractType
                 $dateFormat,
                 $timeFormat,
                 $calendar,
-                $pattern
+                $pattern,
+                $locale
             ));
         } else {
             if ('' !== $pattern && (!str_contains($pattern, 'y') || !str_contains($pattern, 'M') || !str_contains($pattern, 'd'))) {
@@ -282,6 +284,7 @@ class DateType extends AbstractType
             'model_timezone' => null,
             'view_timezone' => null,
             'calendar' => null,
+            'locale' => null,
             'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
@@ -321,7 +324,8 @@ class DateType extends AbstractType
         $resolver->setAllowedTypes('months', 'array');
         $resolver->setAllowedTypes('days', 'array');
         $resolver->setAllowedTypes('input_format', 'string');
-        $resolver->setAllowedTypes('calendar', ['null', \IntlCalendar::class]);
+        $resolver->setAllowedTypes('calendar', ['null', 'int']);
+        $resolver->setAllowedTypes('locale', ['null', 'string']);
 
         $resolver->setNormalizer('html5', static function (Options $options, $html5) {
             if ($html5 && 'single_text' === $options['widget'] && self::HTML5_FORMAT !== $options['format']) {

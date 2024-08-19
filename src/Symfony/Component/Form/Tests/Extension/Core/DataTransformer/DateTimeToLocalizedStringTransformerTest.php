@@ -392,51 +392,35 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         }
     }
 
-    public function testTransformDateTimeWithCustomCalendar()
+    public function testTransformDateTimeWithCustomLocale()
     {
         $dateTime = new \DateTimeImmutable('2024-03-31');
 
-        $weekBeginsOnSunday = \IntlCalendar::createInstance();
-        $weekBeginsOnSunday->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
-
         $this->assertSame(
-            '2024-03-31 2024w14',
-            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnSunday, pattern: "y-MM-dd y'w'w"))->transform($dateTime),
-        );
-
-        $weekBeginsOnMonday = \IntlCalendar::createInstance();
-        $weekBeginsOnMonday->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
-
-        $this->assertSame(
-            '2024-03-31 2024w13',
-            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnMonday, pattern: "y-MM-dd y'w'w"))->transform($dateTime),
+            '113-03-31 113w14',
+            (new DateTimeToLocalizedStringTransformer(
+                calendar: \IntlDateFormatter::TRADITIONAL,
+                pattern: "y-MM-dd y'w'w",
+                locale: 'zh_TW@calendar=roc'
+            ))->transform($dateTime),
         );
     }
 
-    public function testReverseTransformDateTimeWithCustomCalendar()
+    public function testReverseTransformDateTimeWithCustomLocale()
     {
-        $weekBeginsOnSunday = \IntlCalendar::createInstance();
-        $weekBeginsOnSunday->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
-
         $this->assertSame(
             '2024-03-31',
-            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnSunday, pattern: "y-MM-dd"))
-                ->reverseTransform('2024-03-31 2024w14')
-                ->format('Y-m-d'),
-        );
-
-        $weekBeginsOnMonday = \IntlCalendar::createInstance();
-        $weekBeginsOnMonday->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
-
-        $this->assertSame(
-            '2024-03-31',
-            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnMonday, pattern: "y-MM-dd"))
-                ->reverseTransform('2024-03-31 2024w13')
+            (new DateTimeToLocalizedStringTransformer(
+                calendar: \IntlDateFormatter::TRADITIONAL,
+                pattern: "y-MM-dd y'w'w",
+                locale: 'zh_TW@calendar=roc'
+            ))
+                ->reverseTransform('113-03-31 113w14')
                 ->format('Y-m-d'),
         );
     }
 
-    public function testDefaultCalendarIsGregorian()
+    public function testNoCustomLocale()
     {
         $now = new \DateTimeImmutable();
 
