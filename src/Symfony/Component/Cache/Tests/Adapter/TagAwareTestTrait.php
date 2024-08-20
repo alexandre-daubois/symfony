@@ -112,6 +112,20 @@ trait TagAwareTestTrait
         $this->assertTrue($pool->getItem('k')->isHit());
     }
 
+    public function testTagsArePruned()
+    {
+        $pool = $this->createCachePool();
+
+        $i = $pool->getItem('k');
+        $pool->save($i->tag('foo'));
+        $pool->save($i->tag('bar'));
+        $pool->save($i->tag('baz'));
+
+        $pool->prune();
+
+        $this->assertFalse($pool->getItem('k')->isHit());
+    }
+
     public function testTagItemExpiry()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

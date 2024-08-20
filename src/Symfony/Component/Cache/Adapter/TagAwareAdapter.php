@@ -281,7 +281,20 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
 
     public function prune(): bool
     {
-        return $this->pool instanceof PruneableInterface && $this->pool->prune();
+        $pruned = $this->pool instanceof PruneableInterface && $this->pool->prune();
+
+        $tagKeys = array_keys($this->knownTagVersions);
+        $tags = [];
+        foreach ($this->tags->getItems($tagKeys) as $key => $item) {
+            if (!$item->isHit()) {
+                $tags[] = $key;
+            }
+        }
+
+        $this->invalidateTags($tags);
+        $this->tags->deleteItems($tags);
+
+        return $pruned;
     }
 
     public function reset(): void
