@@ -37,13 +37,17 @@ jobs:
         image: bitnami/openldap
         ports:
           - 3389:3389
+          - 1636:1636
         env:
           LDAP_ADMIN_USERNAME: admin
           LDAP_ADMIN_PASSWORD: symfony
           LDAP_ROOT: dc=symfony,dc=com
           LDAP_PORT_NUMBER: 3389
+          LDAP_LDAPS_PORT_NUMBER: 1636
           LDAP_USERS: a
           LDAP_PASSWORDS: a
+          LDAP_ENABLE_TLS: yes
+          LDAP_TLS_VERIFY_CLIENT: never
       ftp:
         image: onekilo79/ftpd_test
         ports:
