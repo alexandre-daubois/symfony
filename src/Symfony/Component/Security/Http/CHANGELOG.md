@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Pass the current token to the `checkPostAuth()` method of user checkers
+ * Deprecate argument `$secret` of `RememberMeAuthenticator`
+ * Deprecate passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
+
 7.1
 ---
 

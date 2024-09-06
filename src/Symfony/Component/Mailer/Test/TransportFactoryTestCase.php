@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
@@ -37,15 +38,27 @@ abstract class TransportFactoryTestCase extends TestCase
 
     abstract public function getFactory(): TransportFactoryInterface;
 
+    /**
+     * @psalm-return iterable<array{0: Dsn, 1: bool}>
+     */
     abstract public static function supportsProvider(): iterable;
 
+    /**
+     * @psalm-return iterable<array{0: Dsn, 1: TransportInterface}>
+     */
     abstract public static function createProvider(): iterable;
 
+    /**
+     * @psalm-return iterable<array{0: Dsn, 1?: string|null}>
+     */
     public static function unsupportedSchemeProvider(): iterable
     {
         return [];
     }
 
+    /**
+     * @psalm-return iterable<array{0: Dsn}>
+     */
     public static function incompleteDsnProvider(): iterable
     {
         return [];
@@ -54,6 +67,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider supportsProvider
      */
+    #[DataProvider('supportsProvider')]
     public function testSupports(Dsn $dsn, bool $supports)
     {
         $factory = $this->getFactory();
@@ -64,6 +78,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider createProvider
      */
+    #[DataProvider('createProvider')]
     public function testCreate(Dsn $dsn, TransportInterface $transport)
     {
         $factory = $this->getFactory();
@@ -77,6 +92,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
+    #[DataProvider('unsupportedSchemeProvider')]
     public function testUnsupportedSchemeException(Dsn $dsn, ?string $message = null)
     {
         $factory = $this->getFactory();
@@ -92,6 +108,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider incompleteDsnProvider
      */
+    #[DataProvider('incompleteDsnProvider')]
     public function testIncompleteDsnException(Dsn $dsn)
     {
         $factory = $this->getFactory();

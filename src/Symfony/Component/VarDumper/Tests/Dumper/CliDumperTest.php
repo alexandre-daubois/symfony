@@ -21,6 +21,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -304,6 +305,21 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=');
     }
 
+    /**
+     * @requires PHP 8.4
+     */
+    public function testVirtualProperties()
+    {
+        $this->assertDumpEquals(<<<EODUMP
+            Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty {
+              +firstName: "John"
+              +lastName: "Doe"
+              +fullName: ~ string
+              -noType: ~
+            }
+            EODUMP, new VirtualProperty());
+    }
+
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+');
@@ -343,7 +359,7 @@ stream resource {@{$ref}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: {
       %sTwig.php:2 {
-        __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = [])
+        __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = []): array
         › foo bar
         ›   twig source
         › 
@@ -503,7 +519,7 @@ EOTXT
     public function testFileLinkFormat()
     {
         if (!class_exists(FileLinkFormatter::class)) {
-            $this->markTestSkipped(sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
+            $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
         }
 
         $data = new Data([

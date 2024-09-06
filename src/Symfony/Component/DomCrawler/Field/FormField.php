@@ -18,19 +18,17 @@ namespace Symfony\Component\DomCrawler\Field;
  */
 abstract class FormField
 {
-    protected \DOMElement $node;
-    protected string $name;
-    protected string|array|null $value = null;
+    use FormFieldTrait;
+
     protected \DOMDocument $document;
     protected \DOMXPath $xpath;
-    protected bool $disabled = false;
 
     /**
      * @param \DOMElement $node The node associated with this field
      */
-    public function __construct(\DOMElement $node)
-    {
-        $this->node = $node;
+    public function __construct(
+        protected \DOMElement $node,
+    ) {
         $this->name = $node->getAttribute('name');
         $this->xpath = new \DOMXPath($node->ownerDocument);
 
@@ -45,7 +43,7 @@ abstract class FormField
         $xpath = new \DOMXPath($this->node->ownerDocument);
 
         if ($this->node->hasAttribute('id')) {
-            $labels = $xpath->query(sprintf('descendant::label[@for="%s"]', $this->node->getAttribute('id')));
+            $labels = $xpath->query(\sprintf('descendant::label[@for="%s"]', $this->node->getAttribute('id')));
             if ($labels->length > 0) {
                 return $labels->item(0);
             }
@@ -57,47 +55,10 @@ abstract class FormField
     }
 
     /**
-     * Returns the name of the field.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Gets the value of the field.
-     */
-    public function getValue(): string|array|null
-    {
-        return $this->value;
-    }
-
-    /**
-     * Sets the value of the field.
-     */
-    public function setValue(?string $value): void
-    {
-        $this->value = $value ?? '';
-    }
-
-    /**
-     * Returns true if the field should be included in the submitted values.
-     */
-    public function hasValue(): bool
-    {
-        return true;
-    }
-
-    /**
      * Check if the current field is disabled.
      */
     public function isDisabled(): bool
     {
         return $this->node->hasAttribute('disabled');
     }
-
-    /**
-     * Initializes the form field.
-     */
-    abstract protected function initialize(): void;
 }

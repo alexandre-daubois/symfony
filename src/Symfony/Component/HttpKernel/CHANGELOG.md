@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Remove `@internal` flag and add `@final` to `ServicesResetter`
+ * Add support for `SYMFONY_DISABLE_RESOURCE_TRACKING` env var
+
 7.1
 ---
 

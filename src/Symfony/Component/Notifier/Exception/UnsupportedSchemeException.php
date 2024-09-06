@@ -92,10 +92,6 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\GatewayApi\GatewayApiTransportFactory::class,
             'package' => 'symfony/gateway-api-notifier',
         ],
-        'gitter' => [
-            'class' => Bridge\Gitter\GitterTransportFactory::class,
-            'package' => 'symfony/gitter-notifier',
-        ],
         'goip' => [
             'class' => Bridge\GoIp\GoIpTransportFactory::class,
             'package' => 'symfony/go-ip-notifier',
@@ -115,6 +111,10 @@ class UnsupportedSchemeException extends LogicException
         'isendpro' => [
             'class' => Bridge\Isendpro\IsendproTransportFactory::class,
             'package' => 'symfony/isendpro-notifier',
+        ],
+        'jolinotif' => [
+            'class' => Bridge\JoliNotif\JoliNotifTransportFactory::class,
+            'package' => 'symfony/joli-notif-notifier',
         ],
         'kaz-info-teh' => [
             'class' => Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
@@ -200,6 +200,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Plivo\PlivoTransportFactory::class,
             'package' => 'symfony/plivo-notifier',
         ],
+        'primotexto' => [
+            'class' => Bridge\Primotexto\PrimotextoTransportFactory::class,
+            'package' => 'symfony/primotexto-notifier',
+        ],
         'pushover' => [
             'class' => Bridge\Pushover\PushoverTransportFactory::class,
             'package' => 'symfony/pushover-notifier',
@@ -227,6 +231,10 @@ class UnsupportedSchemeException extends LogicException
         'sevenio' => [
             'class' => Bridge\Sevenio\SevenIoTransportFactory::class,
             'package' => 'symfony/sevenio-notifier',
+        ],
+        'sipgate' => [
+            'class' => Bridge\Sipgate\SipgateTransportFactory::class,
+            'package' => 'symfony/sipgate-notifier',
         ],
         'simpletextin' => [
             'class' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
@@ -341,14 +349,14 @@ class UnsupportedSchemeException extends LogicException
         }
         $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
-            parent::__construct(sprintf('Unable to send notification via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
+            parent::__construct(\sprintf('Unable to send notification via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
 
             return;
         }
 
-        $message = sprintf('The "%s" scheme is not supported', $dsn->getScheme());
+        $message = \sprintf('The "%s" scheme is not supported', $dsn->getScheme());
         if ($name && $supported) {
-            $message .= sprintf('; supported schemes for notifier "%s" are: "%s"', $name, implode('", "', $supported));
+            $message .= \sprintf('; supported schemes for notifier "%s" are: "%s"', $name, implode('", "', $supported));
         }
 
         parent::__construct($message.'.', 0, $previous);

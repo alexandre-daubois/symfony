@@ -19,12 +19,16 @@ use Symfony\Component\Mailer\Bridge\Mailgun\RemoteEvent\MailgunPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailjet\RemoteEvent\MailjetPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailjet\Webhook\MailjetRequestParser;
+use Symfony\Component\Mailer\Bridge\Mailomat\RemoteEvent\MailomatPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Mailomat\Webhook\MailomatRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\RemoteEvent\PostmarkPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Mailer\Bridge\Resend\RemoteEvent\ResendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Resend\Webhook\ResendRequestParser;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
+use Symfony\Component\Mailer\Bridge\Sweego\RemoteEvent\SweegoPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Sweego\Webhook\SweegoRequestParser;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -48,6 +52,11 @@ return static function (ContainerConfigurator $container) {
             ->args([service('mailer.payload_converter.mailjet')])
         ->alias(MailjetRequestParser::class, 'mailer.webhook.request_parser.mailjet')
 
+        ->set('mailer.payload_converter.mailomat', MailomatPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.mailomat', MailomatRequestParser::class)
+            ->args([service('mailer.payload_converter.mailomat')])
+        ->alias(MailomatRequestParser::class, 'mailer.webhook.request_parser.mailomat')
+
         ->set('mailer.payload_converter.postmark', PostmarkPayloadConverter::class)
         ->set('mailer.webhook.request_parser.postmark', PostmarkRequestParser::class)
             ->args([service('mailer.payload_converter.postmark')])
@@ -62,5 +71,10 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.sendgrid', SendgridRequestParser::class)
             ->args([service('mailer.payload_converter.sendgrid')])
         ->alias(SendgridRequestParser::class, 'mailer.webhook.request_parser.sendgrid')
+
+        ->set('mailer.payload_converter.sweego', SweegoPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.sweego', SweegoRequestParser::class)
+            ->args([service('mailer.payload_converter.sweego')])
+        ->alias(SweegoRequestParser::class, 'mailer.webhook.request_parser.sweego')
     ;
 };

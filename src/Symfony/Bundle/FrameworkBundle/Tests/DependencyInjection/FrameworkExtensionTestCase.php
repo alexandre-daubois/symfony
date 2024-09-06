@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
@@ -93,6 +94,8 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 abstract class FrameworkExtensionTestCase extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private static array $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
@@ -1766,24 +1769,24 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'cacheRedisTagAwareBaz2',
         ];
         foreach ($argNames as $argumentName) {
-            $aliasesForArguments[] = sprintf('%s $%s', TagAwareCacheInterface::class, $argumentName);
-            $aliasesForArguments[] = sprintf('%s $%s', CacheInterface::class, $argumentName);
-            $aliasesForArguments[] = sprintf('%s $%s', CacheItemPoolInterface::class, $argumentName);
+            $aliasesForArguments[] = \sprintf('%s $%s', TagAwareCacheInterface::class, $argumentName);
+            $aliasesForArguments[] = \sprintf('%s $%s', CacheInterface::class, $argumentName);
+            $aliasesForArguments[] = \sprintf('%s $%s', CacheItemPoolInterface::class, $argumentName);
         }
 
         foreach ($aliasesForArguments as $aliasForArgumentStr) {
             $aliasForArgument = $container->getAlias($aliasForArgumentStr);
-            $this->assertNotNull($aliasForArgument, sprintf("No alias found for '%s'", $aliasForArgumentStr));
+            $this->assertNotNull($aliasForArgument, \sprintf("No alias found for '%s'", $aliasForArgumentStr));
 
             $def = $container->getDefinition((string) $aliasForArgument);
-            $this->assertInstanceOf(ChildDefinition::class, $def, sprintf("No definition found for '%s'", $aliasForArgumentStr));
+            $this->assertInstanceOf(ChildDefinition::class, $def, \sprintf("No definition found for '%s'", $aliasForArgumentStr));
 
             $defParent = $container->getDefinition($def->getParent());
             if ($defParent instanceof ChildDefinition) {
                 $defParent = $container->getDefinition($defParent->getParent());
             }
 
-            $this->assertSame(RedisTagAwareAdapter::class, $defParent->getClass(), sprintf("'%s' is not %s", $aliasForArgumentStr, RedisTagAwareAdapter::class));
+            $this->assertSame(RedisTagAwareAdapter::class, $defParent->getClass(), \sprintf("'%s' is not %s", $aliasForArgumentStr, RedisTagAwareAdapter::class));
         }
     }
 
@@ -1831,6 +1834,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $this->assertTrue($def->hasTag('cache.taggable'));
             $this->assertSame($expectedPool, $def->getTag('cache.taggable')[0]['pool'] ?? null);
         }
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testTaggableCacheAppIsDeprecated()
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 7.2: Using the "tags" option with the "cache.app" adapter is deprecated. You can use the "cache.app.taggable" adapter instead (aliased to the TagAwareCacheInterface for autowiring).');
+
+        $this->createContainerFromFile('cache_cacheapp_tagaware');
     }
 
     /**
@@ -2191,7 +2204,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {
             $transportFactoryName = strtolower(preg_replace('/(.)([A-Z])/', '$1-$2', $bridgeDirectory->getFilename()));
-            $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), sprintf('Did you forget to add the "%s" TransportFactory to the $classToServices array in FrameworkExtension?', $bridgeDirectory->getFilename()));
+            $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), \sprintf('Did you forget to add the "%s" TransportFactory to the $classToServices array in FrameworkExtension?', $bridgeDirectory->getFilename()));
         }
     }
 
@@ -2341,7 +2354,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('trusted_proxies_private_ranges');
 
-        $this->assertSame(IpUtils::PRIVATE_SUBNETS, array_map('trim', explode(',', $container->getParameter('kernel.trusted_proxies'))));
+        $this->assertSame(IpUtils::PRIVATE_SUBNETS, $container->getParameter('kernel.trusted_proxies'));
     }
 
     public function testWebhook()
@@ -2357,7 +2370,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(RequestParser::class, $container->getDefinition('webhook.request_parser')->getClass());
 
         $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
-        $this->assertFalse($container->getDefinition('webhook.body_configurator.json')->hasErrors());
+        $this->assertEquals('webhook.payload_serializer.serializer', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
     }
 
     public function testWebhookWithoutSerializer()
@@ -2369,11 +2382,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('webhook_without_serializer');
 
         $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
-        $this->assertTrue($container->getDefinition('webhook.body_configurator.json')->hasErrors());
-        $this->assertSame(
-            ['You cannot use the "webhook transport" service since the Serializer component is not enabled. Try setting "framework.serializer.enabled" to true.'],
-            $container->getDefinition('webhook.body_configurator.json')->getErrors()
-        );
+        $this->assertEquals('webhook.payload_serializer.json', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
     }
 
     public function testAssetMapperWithoutAssets()
@@ -2474,14 +2483,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $id, $adapter, $defaultLifetime)
     {
-        $this->assertTrue($container->has($id), sprintf('Service definition "%s" for cache pool of type "%s" is registered', $id, $adapter));
+        $this->assertTrue($container->has($id), \sprintf('Service definition "%s" for cache pool of type "%s" is registered', $id, $adapter));
 
         $poolDefinition = $container->getDefinition($id);
 
-        $this->assertInstanceOf(ChildDefinition::class, $poolDefinition, sprintf('Cache pool "%s" is based on an abstract cache pool.', $id));
+        $this->assertInstanceOf(ChildDefinition::class, $poolDefinition, \sprintf('Cache pool "%s" is based on an abstract cache pool.', $id));
 
-        $this->assertTrue($poolDefinition->hasTag('cache.pool'), sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $id));
-        $this->assertFalse($poolDefinition->isAbstract(), sprintf('Service definition "%s" is not abstract.', $id));
+        $this->assertTrue($poolDefinition->hasTag('cache.pool'), \sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $id));
+        $this->assertFalse($poolDefinition->isAbstract(), \sprintf('Service definition "%s" is not abstract.', $id));
 
         $tag = $poolDefinition->getTag('cache.pool');
         $this->assertArrayHasKey('default_lifetime', $tag[0], 'The default lifetime is stored as an attribute of the "cache.pool" tag.');

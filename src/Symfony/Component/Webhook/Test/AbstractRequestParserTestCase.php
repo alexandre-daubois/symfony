@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Webhook\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RemoteEvent\RemoteEvent;
@@ -24,6 +25,7 @@ abstract class AbstractRequestParserTestCase extends TestCase
     /**
      * @dataProvider getPayloads
      */
+    #[DataProvider('getPayloads')]
     public function testParse(string $payload, RemoteEvent $expected)
     {
         $request = $this->createRequest($payload);
@@ -32,6 +34,9 @@ abstract class AbstractRequestParserTestCase extends TestCase
         $this->assertEquals($expected, $wh);
     }
 
+    /**
+     * @return iterable<array{string, RemoteEvent}>
+     */
     public static function getPayloads(): iterable
     {
         $currentDir = \dirname((new \ReflectionClass(static::class))->getFileName());

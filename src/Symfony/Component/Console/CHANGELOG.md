@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for `FORCE_COLOR` environment variable
+ * Add `verbosity` argument to `mustRun` process helper method
+
 7.1
 ---
 

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate `!tagged` tag, use `!tagged_iterator` instead
+ * Add a `ContainerBuilder::registerChild()` shortcut method for registering child definitions
+ * Add support for `key-type` in `XmlFileLoader`
+
 7.1
 ---
 

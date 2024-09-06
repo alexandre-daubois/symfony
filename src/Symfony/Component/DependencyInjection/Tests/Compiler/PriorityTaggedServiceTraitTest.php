@@ -153,6 +153,9 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
         $container->register('service4', HelloInterface::class)->addTag('my_custom_tag');
 
+        $definition = $container->register('debug.service5', \stdClass::class)->addTag('my_custom_tag');
+        $definition->addTag('container.decorator', ['id' => 'service5']);
+
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
@@ -161,6 +164,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
             'service1' => new TypedReference('service1', FooTagClass::class),
             '10' => new TypedReference('service3', IntTagClass::class),
             'service4' => new TypedReference('service4', HelloInterface::class),
+            'service5' => new TypedReference('debug.service5', \stdClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));
@@ -187,12 +191,12 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     public static function provideInvalidDefaultMethods(): iterable
     {
-        yield ['getMethodShouldBeStatic', null, sprintf('Method "%s::getMethodShouldBeStatic()" should be static.', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBeStatic', 'foo', sprintf('Either method "%s::getMethodShouldBeStatic()" should be static or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBePublicInsteadProtected', null, sprintf('Method "%s::getMethodShouldBePublicInsteadProtected()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBePublicInsteadProtected', 'foo', sprintf('Either method "%s::getMethodShouldBePublicInsteadProtected()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBePublicInsteadPrivate', null, sprintf('Method "%s::getMethodShouldBePublicInsteadPrivate()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBePublicInsteadPrivate', 'foo', sprintf('Either method "%s::getMethodShouldBePublicInsteadPrivate()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBeStatic', null, \sprintf('Method "%s::getMethodShouldBeStatic()" should be static.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBeStatic', 'foo', \sprintf('Either method "%s::getMethodShouldBeStatic()" should be static or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadProtected', null, \sprintf('Method "%s::getMethodShouldBePublicInsteadProtected()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadProtected', 'foo', \sprintf('Either method "%s::getMethodShouldBePublicInsteadProtected()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadPrivate', null, \sprintf('Method "%s::getMethodShouldBePublicInsteadPrivate()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadPrivate', 'foo', \sprintf('Either method "%s::getMethodShouldBePublicInsteadPrivate()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
     }
 
     public function testTaggedItemAttributes()

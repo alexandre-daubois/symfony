@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate the `VersionAwareTest` trait, use feature detection instead
+ * Add support for the `calendar` option in `DateType`
+
 7.1
 ---
 

@@ -67,7 +67,7 @@ class BinaryNode extends Node
 
         if (isset(self::FUNCTIONS[$operator])) {
             $compiler
-                ->raw(sprintf('%s(', self::FUNCTIONS[$operator]))
+                ->raw(\sprintf('%s(', self::FUNCTIONS[$operator]))
                 ->compile($this->nodes['left'])
                 ->raw(', ')
                 ->compile($this->nodes['right'])
@@ -130,6 +130,10 @@ class BinaryNode extends Node
                 return $left ^ $right;
             case '&':
                 return $left & $right;
+            case '<<':
+                return $left << $right;
+            case '>>':
+                return $left >> $right;
             case '==':
                 return $left == $right;
             case '===':
@@ -182,7 +186,7 @@ class BinaryNode extends Node
 
     private function evaluateMatches(string $regexp, ?string $str): int
     {
-        set_error_handler(static fn ($t, $m) => throw new SyntaxError(sprintf('Regexp "%s" passed to "matches" is not valid', $regexp).substr($m, 12)));
+        set_error_handler(static fn ($t, $m) => throw new SyntaxError(\sprintf('Regexp "%s" passed to "matches" is not valid', $regexp).substr($m, 12)));
         try {
             return preg_match($regexp, (string) $str);
         } finally {

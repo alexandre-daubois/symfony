@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add optional `$requests` parameter to `RequestStack::__construct()`
+ * Add optional `$v4Bytes` and `$v6Bytes` parameters to `IpUtils::anonymize()`
+ * Add `PRIVATE_SUBNETS` as a shortcut for private IP address ranges to `Request::setTrustedProxies()`
+
 7.1
 ---
 
