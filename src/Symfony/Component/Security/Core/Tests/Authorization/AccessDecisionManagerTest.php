@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends TestCase
 {
-    public function provideBadVoterResults(): array
+    public static function provideBadVoterResults(): array
     {
         return [
             [3],
