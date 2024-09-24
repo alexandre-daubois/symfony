@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter;
 
 /**
+ * @requires PHP <= 7.4
  * @requires extension couchbase <3.0.0
  * @requires extension couchbase >=2.6.0
  *
