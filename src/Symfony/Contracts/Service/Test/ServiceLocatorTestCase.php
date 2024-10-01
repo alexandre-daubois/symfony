@@ -66,10 +66,9 @@ abstract class ServiceLocatorTestCase extends TestCase
 
     public function testThrowsOnUndefinedInternalService()
     {
-        if (!$this->getExpectedException()) {
-            $this->expectException(\Psr\Container\NotFoundExceptionInterface::class);
-            $this->expectExceptionMessage('The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.');
-        }
+        $this->expectException(\Psr\Container\NotFoundExceptionInterface::class);
+        $this->expectExceptionMessage('The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.');
+
         $locator = $this->getServiceLocator([
             'foo' => function () use (&$locator) { return $locator->get('bar'); },
         ]);
