@@ -6,6 +6,7 @@ require_once __DIR__.\DIRECTORY_SEPARATOR.'AddToList'.\DIRECTORY_SEPARATOR.'Tran
 require_once __DIR__.\DIRECTORY_SEPARATOR.'AddToList'.\DIRECTORY_SEPARATOR.'MessengerConfig.php';
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * This class is automatically generated to help in creating a config.
@@ -14,6 +15,7 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
 {
     private $translator;
     private $messenger;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     public function translator(array $value = []): \Symfony\Config\AddToList\TranslatorConfig
@@ -38,6 +40,56 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
         }
 
         return $this->messenger;
+    }
+
+    /*
+     * @param array{
+     *     translator?: array{
+     *         fallbacks?: array<string|int|float|bool>,
+     *         sources?: array<string, string|int|float|bool>,
+     *         books?: array{
+     *             page?: array<array{
+     *                 number?: int<min, max>,
+     *                 content?: string|int|float|bool,
+     *             }>,
+     *         },
+     *     },
+     *     messenger?: array{
+     *         routing?: array<string, array{
+     *             senders?: array<string|int|float|bool>,
+     *         }>,
+     *         receiving?: array<array{
+     *             priority?: int<min, max>,
+     *             color?: string|int|float|bool,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function configure(
+        // config:
+        #[ArrayShape([
+            'translator' => [
+                'fallbacks' => ['string|int|float|bool'],
+                'sources' => ['string|int|float|bool'],
+                'books' => [ /* Deprecated: The child node "books" at path "add_to_list.translator.books" is deprecated. looks for translation in old fashion way */
+                    'page' => [[
+                        'number' => 'int<min, max>',
+                        'content' => 'string|int|float|bool',
+                    ]],
+                ],
+            ],
+            'messenger' => [
+                'routing' => [[
+                    'senders' => ['string|int|float|bool'],
+                ]],
+                'receiving' => [[
+                    'priority' => 'int<min, max>',
+                    'color' => 'string|int|float|bool',
+                ]],
+            ],
+        ])] array $config = []): void
+    {
+        $this->configOutput = $config;
     }
 
     public function getExtensionAlias(): string
@@ -66,6 +118,10 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['translator'])) {
             $output['translator'] = $this->translator->toArray();

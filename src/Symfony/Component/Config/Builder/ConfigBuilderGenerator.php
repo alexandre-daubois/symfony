@@ -31,7 +31,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
+class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface, ConfigFunctionAwareBuilderGeneratorInterface
 {
     /**
      * @var ClassBuilder[]
@@ -55,9 +55,9 @@ class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 
         $path = $this->getFullPath($rootClass);
         if (!is_file($path)) {
-            // Generate the class if the file not exists
-            $this->classes[] = $rootClass;
+            // Generate the class if the file doesn't exist
             $this->buildNode($rootNode, $rootClass, $this->getSubNamespace($rootClass));
+            $this->buildConfigureOption($rootNode, $rootClass);
             $rootClass->addImplements(ConfigBuilderInterface::class);
             $rootClass->addMethod('getExtensionAlias', '
 public function NAME(): string
@@ -65,6 +65,7 @@ public function NAME(): string
     return \'ALIAS\';
 }', ['ALIAS' => $rootNode->getPath()]);
 
+            $this->writeRootClass($rootClass);
             $this->writeClasses();
         }
 
@@ -76,6 +77,11 @@ public function NAME(): string
         };
     }
 
+    public function buildConfigFunction(array $configurations): \Closure
+    {
+        return (new ConfigFunctionGenerator($this->outputDir))->build($configurations);
+    }
+
     private function getFullPath(ClassBuilder $class): string
     {
         $directory = $this->outputDir.\DIRECTORY_SEPARATOR.$class->getDirectory();
@@ -84,6 +90,18 @@ public function NAME(): string
         }
 
         return $directory.\DIRECTORY_SEPARATOR.$class->getFilename();
+    }
+
+    private function writeRootClass(ClassBuilder $rootClass): void
+    {
+        $this->buildConstructor($rootClass);
+        $this->buildToArray($rootClass, true);
+        if ($rootClass->getProperties()) {
+            $rootClass->addProperty('_usedProperties', null, '[]');
+        }
+        $this->buildSetExtraKey($rootClass);
+
+        file_put_contents($this->getFullPath($rootClass), $rootClass->build());
     }
 
     private function writeClasses(): void
@@ -100,6 +118,29 @@ public function NAME(): string
         }
 
         $this->classes = [];
+    }
+
+    private function buildConfigureOption(ArrayNode $node, ClassBuilder $class): void
+    {
+        $class->addUse(\JetBrains\PhpStorm\ArrayShape::class);
+        $class->addProperty('configOutput', defaultValue: '[]');
+
+        $body = '
+/*
+ * @param PHPDOC_ARRAY_SHAPE $config
+ */
+public function NAME(
+    // config:
+    JETBRAINS_ATTRIBUTE PARAM_TYPE $config = []): void
+{
+    $this->configOutput = $config;
+}';
+
+        $class->addMethod('configure', $body, [
+            'PARAM_TYPE' => 'array',
+            'PHPDOC_ARRAY_SHAPE' => ArrayShapeGenerator::generate($node, ArrayShapeGenerator::FORMAT_PHPDOC),
+            'JETBRAINS_ATTRIBUTE' => str_replace("\n", "\n    ", ArrayShapeGenerator::generate($node, ArrayShapeGenerator::FORMAT_JETBRAINS_ATTRIBUTE)),
+        ]);
     }
 
     private function buildNode(NodeInterface $node, ClassBuilder $class, string $namespace): void
@@ -469,10 +510,24 @@ public function NAME($value): static
         return $name;
     }
 
-    private function buildToArray(ClassBuilder $class): void
+    private function buildToArray(ClassBuilder $class, bool $rootClass = false): void
     {
-        $body = '$output = [];';
+        $body = '';
+        if ($rootClass) {
+            $body = 'if ($this->configOutput) {
+        return $this->configOutput;
+    }
+
+    ';
+        }
+
+        $body .= '$output = [];';
+
         foreach ($class->getProperties() as $p) {
+            if ('configOutput' === $p->getName()) {
+                continue;
+            }
+
             $code = '$this->PROPERTY';
             if (null !== $p->getType()) {
                 if ($p->isArray()) {
@@ -509,6 +564,10 @@ public function NAME(): array
     {
         $body = '';
         foreach ($class->getProperties() as $p) {
+            if ('configOutput' === $p->getName()) {
+                continue;
+            }
+
             $code = '$value[\'ORG_NAME\']';
             if (null !== $p->getType()) {
                 if ($p->isArray()) {

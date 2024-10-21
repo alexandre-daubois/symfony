@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Config\Builder\ConfigFunctionAwareBuilderGeneratorInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -31,6 +32,9 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * @runTestsInSeparateProcesses because the loaded-state of the "config()" function is global
+ */
 class ConfigBuilderCacheWarmerTest extends TestCase
 {
     private string $varDir;
@@ -182,6 +186,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
+        
+        if (interface_exists(ConfigFunctionAwareBuilderGeneratorInterface::class )) {
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/config.php');
+            self::assertTrue(\function_exists('Symfony\Config\config'), 'the config() function should be generated and loaded');
+        }
     }
 
     public function testExtensionAddedInKernel()
@@ -222,6 +231,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/AppConfig.php');
+
+        if (interface_exists(ConfigFunctionAwareBuilderGeneratorInterface::class )) {
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/config.php');
+            self::assertTrue(\function_exists('Symfony\Config\config'), 'the config() function should be generated and loaded');
+        }
     }
 
     public function testKernelAsExtension()
@@ -267,6 +281,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/KernelConfig.php');
+
+        if (interface_exists(ConfigFunctionAwareBuilderGeneratorInterface::class )) {
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/config.php');
+            self::assertTrue(\function_exists('Symfony\Config\config'), 'the config() function should be generated and loaded');
+        }
     }
 
     public function testExtensionsExtendedInBuildMethods()
@@ -333,6 +352,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig/FormLoginConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig/TokenConfig.php');
+        
+        if (interface_exists(ConfigFunctionAwareBuilderGeneratorInterface::class)) {
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/config.php');
+            self::assertTrue(\function_exists('Symfony\Config\config'), 'the config() function should be generated and loaded');
+        }
     }
 }
 

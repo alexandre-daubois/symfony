@@ -3,6 +3,7 @@
 namespace Symfony\Config;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
@@ -13,6 +14,7 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
     private $enabled;
     private $favoriteFloat;
     private $goodIntegers;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     /**
@@ -54,6 +56,24 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         return $this;
     }
 
+    /*
+     * @param array{
+     *     enabled?: bool,
+     *     favorite_float?: float,
+     *     good_integers?: array<int<min, max>>,
+     * } $config
+     */
+    public function configure(
+        // config:
+        #[ArrayShape([
+            'enabled' => 'bool', /* Default: false */
+            'favorite_float' => 'float',
+            'good_integers' => ['int<min, max>'],
+        ])] array $config = []): void
+    {
+        $this->configOutput = $config;
+    }
+
     public function getExtensionAlias(): string
     {
         return 'placeholders';
@@ -86,6 +106,10 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['enabled'])) {
             $output['enabled'] = $this->enabled;

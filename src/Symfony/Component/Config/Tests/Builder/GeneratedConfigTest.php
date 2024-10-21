@@ -31,6 +31,7 @@ use Symfony\Config\AddToListConfig;
  *
  * @covers \Symfony\Component\Config\Builder\ClassBuilder
  * @covers \Symfony\Component\Config\Builder\ConfigBuilderGenerator
+ * @covers \Symfony\Component\Config\Builder\ConfigFunctionGenerator
  * @covers \Symfony\Component\Config\Builder\Method
  * @covers \Symfony\Component\Config\Builder\Property
  */
@@ -100,6 +101,20 @@ class GeneratedConfigTest extends TestCase
             $output = AbstractConfigurator::processValue($output);
         }
         $this->assertSame($expectedOutput, $output);
+    }
+
+    /**
+     * @dataProvider fixtureNames
+     */
+    public function testConfigFunction(string $name, string $alias)
+    {
+        $basePath = __DIR__.'/Fixtures/';
+        $expectedOutput = $basePath.$name.'.config_function_output.php';
+
+        $configBuilder = $this->generateConfigFunctionBuilder($alias, 'Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);
+
+        $this->assertIsCallable($configBuilder);
+        $this->assertFileEquals($expectedOutput, $outputDir.'/Symfony/Config/config.php');
     }
 
     /**
@@ -175,6 +190,18 @@ class GeneratedConfigTest extends TestCase
         $loader = (new ConfigBuilderGenerator($outputDir))->build(new $configurationClass());
 
         return $loader();
+    }
+
+    private function generateConfigFunctionBuilder(string $alias, string $configurationClass, ?string &$outputDir = null)
+    {
+        $outputDir = tempnam(sys_get_temp_dir(), 'sf_config_builder_');
+        unlink($outputDir);
+        mkdir($outputDir);
+        $this->tempDir[] = $outputDir;
+
+        $configurationClass = new $configurationClass();
+
+        return (new ConfigBuilderGenerator($outputDir))->buildConfigFunction([$alias => $configurationClass]);
     }
 
     private function assertDirectorySame($expected, $current)

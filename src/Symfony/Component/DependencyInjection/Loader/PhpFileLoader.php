@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Config\Builder\ConfigBuilderInterface;
+use Symfony\Component\Config\Builder\ConfigFunctionAwareBuilderGeneratorInterface;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
@@ -36,6 +37,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 class PhpFileLoader extends FileLoader
 {
     protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    private array $configurations = [];
 
     public function __construct(
         ContainerBuilder $container,
@@ -56,6 +58,19 @@ class PhpFileLoader extends FileLoader
         $path = $this->locator->locate($resource);
         $this->setCurrentDir(\dirname($path));
         $this->container->fileExists($path);
+
+        if ($this->generator instanceof ConfigFunctionAwareBuilderGeneratorInterface) {
+            foreach ($this->container->getExtensions() as $extension) {
+                if (!$extension instanceof ConfigurationExtensionInterface) {
+                    continue;
+                }
+
+                $alias = lcfirst(str_replace('_', '', ucwords($extension->getAlias(), '_')));
+                $this->configurations[$alias] ??= $extension->getConfiguration([], $this->container);
+            }
+
+            $this->generator->buildConfigFunction($this->configurations)();
+        }
 
         // the closure forbids access to the private scope in the included file
         $load = \Closure::bind(function ($path, $env) use ($container, $loader, $resource, $type) {
@@ -220,7 +235,7 @@ class PhpFileLoader extends FileLoader
             throw new \LogicException(\sprintf('You cannot use the config builder for "%s" because the extension does not implement "%s".', $namespace, ConfigurationExtensionInterface::class));
         }
 
-        $configuration = $extension->getConfiguration([], $this->container);
+        $configuration = $this->configurations[$alias] ?? $extension->getConfiguration([], $this->container);
         $loader = $this->generator->build($configuration);
 
         return $loader();
