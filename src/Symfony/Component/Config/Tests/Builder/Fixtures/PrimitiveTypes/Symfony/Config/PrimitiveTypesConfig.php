@@ -3,6 +3,7 @@
 namespace Symfony\Config;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
@@ -16,6 +17,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     private $integerNode;
     private $scalarNode;
     private $scalarNodeWithDefault;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     /**
@@ -96,6 +98,28 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
         return $this;
     }
 
+    /*
+     * @param array{
+     *     boolean_node?: bool,
+     *     enum_node?: "foo"|"bar"|"baz"|Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar,
+     *     float_node?: float<min, max>,
+     *     integer_node?: int<min, max>,
+     *     scalar_node?: string|int|float|bool,
+     *     scalar_node_with_default?: string|int|float|bool,
+     * } $config
+     */
+    public function configure(#[ArrayShape([
+        'boolean_node' => 'bool',
+        'enum_node' => '"foo"|"bar"|"baz"|Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar',
+        'float_node' => 'float<min, max>',
+        'integer_node' => 'int<min, max>',
+        'scalar_node' => 'string|int|float|bool',
+        'scalar_node_with_default' => 'string|int|float|bool', /* Default value: true. */
+    ])] array $config = []): void
+    {
+        $this->configOutput = $config;
+    }
+
     public function getExtensionAlias(): string
     {
         return 'primitive_types';
@@ -146,6 +170,10 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['booleanNode'])) {
             $output['boolean_node'] = $this->booleanNode;

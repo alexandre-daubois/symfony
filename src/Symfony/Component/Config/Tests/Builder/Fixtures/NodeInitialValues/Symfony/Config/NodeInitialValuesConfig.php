@@ -6,6 +6,7 @@ require_once __DIR__.\DIRECTORY_SEPARATOR.'NodeInitialValues'.\DIRECTORY_SEPARAT
 require_once __DIR__.\DIRECTORY_SEPARATOR.'NodeInitialValues'.\DIRECTORY_SEPARATOR.'MessengerConfig.php';
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * This class is automatically generated to help in creating a config.
@@ -14,6 +15,7 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
 {
     private $someCleverName;
     private $messenger;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     public function someCleverName(array $value = []): \Symfony\Config\NodeInitialValues\SomeCleverNameConfig
@@ -38,6 +40,32 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
         }
 
         return $this->messenger;
+    }
+
+    /*
+     * @param array{
+     *     some_clever_name?: array{
+     *         first?: string|int|float|bool,
+     *         second?: string|int|float|bool,
+     *         third?: string|int|float|bool,
+     *     },
+     *     messenger?: array{
+     *         transports?: array<array-key, mixed>,
+     *     },
+     * } $config
+     */
+    public function configure(#[ArrayShape([
+        'some_clever_name' => [
+            'first' => 'string|int|float|bool',
+            'second' => 'string|int|float|bool',
+            'third' => 'string|int|float|bool',
+        ],
+        'messenger' => [
+            'transports' => 'array<array-key, mixed>',
+        ],
+    ])] array $config = []): void
+    {
+        $this->configOutput = $config;
     }
 
     public function getExtensionAlias(): string
@@ -66,6 +94,10 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['someCleverName'])) {
             $output['some_clever_name'] = $this->someCleverName->toArray();

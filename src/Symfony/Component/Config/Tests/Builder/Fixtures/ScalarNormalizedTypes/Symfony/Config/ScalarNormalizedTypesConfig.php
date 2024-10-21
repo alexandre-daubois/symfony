@@ -9,6 +9,7 @@ require_once __DIR__.\DIRECTORY_SEPARATOR.'ScalarNormalizedTypes'.\DIRECTORY_SEP
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * This class is automatically generated to help in creating a config.
@@ -21,6 +22,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     private $listObject;
     private $keyedListObject;
     private $nested;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     /**
@@ -128,6 +130,46 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
         return $this->nested;
     }
 
+    /*
+     * @param array{
+     *     simple_array?: array<array-key, mixed>,
+     *     keyed_array?: array<array-key, mixed>,
+     *     object?: array{
+     *         enabled?: bool,
+     *         date_format?: string|int|float|bool,
+     *         remove_used_context_fields?: bool,
+     *     },
+     *     list_object: array<array-key, mixed>,
+     *     keyed_list_object?: array<array-key, mixed>,
+     *     nested?: array{
+     *         nested_object?: array{
+     *             enabled?: bool,
+     *         },
+     *         nested_list_object?: array<array-key, mixed>,
+     *     },
+     * } $config
+     */
+    public function configure(#[ArrayShape([
+        'simple_array' => 'array<array-key, mixed>',
+        'keyed_array' => 'array<array-key, mixed>',
+        'object' => [
+            'enabled' => 'bool', /* Default value: null. */
+            'date_format' => 'string|int|float|bool',
+            'remove_used_context_fields' => 'bool',
+        ],
+        'list_object' => 'array<array-key, mixed>',
+        'keyed_list_object' => 'array<array-key, mixed>',
+        'nested' => [
+            'nested_object' => [
+                'enabled' => 'bool', /* Default value: null. */
+            ],
+            'nested_list_object' => 'array<array-key, mixed>',
+        ],
+    ])] array $config = []): void
+    {
+        $this->configOutput = $config;
+    }
+
     public function getExtensionAlias(): string
     {
         return 'scalar_normalized_types';
@@ -178,6 +220,10 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['simpleArray'])) {
             $output['simple_array'] = $this->simpleArray;
