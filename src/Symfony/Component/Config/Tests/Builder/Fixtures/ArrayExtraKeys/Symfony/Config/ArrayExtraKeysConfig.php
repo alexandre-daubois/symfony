@@ -7,6 +7,7 @@ require_once __DIR__.\DIRECTORY_SEPARATOR.'ArrayExtraKeys'.\DIRECTORY_SEPARATOR.
 require_once __DIR__.\DIRECTORY_SEPARATOR.'ArrayExtraKeys'.\DIRECTORY_SEPARATOR.'BazConfig.php';
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * This class is automatically generated to help in creating a config.
@@ -16,6 +17,7 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
     private $foo;
     private $bar;
     private $baz;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     public function foo(array $value = []): \Symfony\Config\ArrayExtraKeys\FooConfig
@@ -47,6 +49,28 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
         }
 
         return $this->baz;
+    }
+
+    /*
+     * @param array{
+     *     foo?: array{
+     *         baz?: string|int|float|bool,
+     *         qux?: string|int|float|bool,
+     *     },
+     *     bar?: array<array-key, mixed>,
+     *     baz?: array<array-key, mixed>,
+     * } $config
+     */
+    public function configure(#[ArrayShape([
+        'foo' => [
+            'baz' => 'string|int|float|bool',
+            'qux' => 'string|int|float|bool',
+        ],
+        'bar' => 'array<array-key, mixed>',
+        'baz' => 'array<array-key, mixed>',
+    ])] array $config = []): void
+    {
+        $this->configOutput = $config;
     }
 
     public function getExtensionAlias(): string
@@ -81,6 +105,10 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['foo'])) {
             $output['foo'] = $this->foo->toArray();

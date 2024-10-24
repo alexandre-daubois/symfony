@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add the `Symfony\Config\config()` function
+
 7.2
 ---
 

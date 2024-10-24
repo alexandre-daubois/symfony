@@ -6,6 +6,7 @@ require_once __DIR__.\DIRECTORY_SEPARATOR.'AddToList'.\DIRECTORY_SEPARATOR.'Tran
 require_once __DIR__.\DIRECTORY_SEPARATOR.'AddToList'.\DIRECTORY_SEPARATOR.'MessengerConfig.php';
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * This class is automatically generated to help in creating a config.
@@ -14,6 +15,7 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
 {
     private $translator;
     private $messenger;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     public function translator(array $value = []): \Symfony\Config\AddToList\TranslatorConfig
@@ -38,6 +40,38 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
         }
 
         return $this->messenger;
+    }
+
+    /*
+     * @param array{
+     *     translator?: array{
+     *         fallbacks?: array<array-key, mixed>,
+     *         sources?: array<array-key, mixed>,
+     *         books?: array{
+     *             page?: array<array-key, mixed>,
+     *         },
+     *     },
+     *     messenger?: array{
+     *         routing?: array<array-key, mixed>,
+     *         receiving?: array<array-key, mixed>,
+     *     },
+     * } $config
+     */
+    public function configure(#[ArrayShape([
+        'translator' => [
+            'fallbacks' => 'array<array-key, mixed>',
+            'sources' => 'array<array-key, mixed>',
+            'books' => [
+                'page' => 'array<array-key, mixed>',
+            ], /* Deprecated: The child node "books" at path "add_to_list.translator.books" is deprecated. looks for translation in old fashion way */
+        ],
+        'messenger' => [
+            'routing' => 'array<array-key, mixed>',
+            'receiving' => 'array<array-key, mixed>',
+        ],
+    ])] array $config = []): void
+    {
+        $this->configOutput = $config;
     }
 
     public function getExtensionAlias(): string
@@ -66,6 +100,10 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['translator'])) {
             $output['translator'] = $this->translator->toArray();

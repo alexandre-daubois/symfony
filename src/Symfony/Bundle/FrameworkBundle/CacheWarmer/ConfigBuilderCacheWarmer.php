@@ -12,8 +12,11 @@
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Config\Builder\ArrayShapeGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
+use Symfony\Component\Config\Builder\ConfigFunctionGenerator;
+use Symfony\Component\Config\Builder\FunctionBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,6 +32,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * Generate all config builders.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  *
  * @final since Symfony 7.1
  */
@@ -68,19 +72,30 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
             }
         }
 
+        $configurations = [];
         foreach ($extensions as $extension) {
+            if (null === $configuration = $this->getConfigurationFromExtension($extension)) {
+                continue;
+            }
+
+            $configurations[$extension->getAlias()] = $configuration;
+
             try {
-                $this->dumpExtension($extension, $generator);
+                $generator->build($configurations[$extension->getAlias()]);
             } catch (\Exception $e) {
                 $this->logger?->warning('Failed to generate ConfigBuilder for extension {extensionClass}: '.$e->getMessage(), ['exception' => $e, 'extensionClass' => $extension::class]);
             }
+        }
+
+        if ($configurations) {
+            (new ConfigFunctionGenerator($buildDir))->build($configurations);
         }
 
         // No need to preload anything
         return [];
     }
 
-    private function dumpExtension(ExtensionInterface $extension, ConfigBuilderGeneratorInterface $generator): void
+    private function getConfigurationFromExtension(ExtensionInterface $extension): ?ConfigurationInterface
     {
         $configuration = null;
         if ($extension instanceof ConfigurationInterface) {
@@ -90,11 +105,7 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
             $configuration = $extension->getConfiguration([], new ContainerBuilder($container instanceof Container ? new ContainerBag($container) : new ParameterBag()));
         }
 
-        if (!$configuration) {
-            return;
-        }
-
-        $generator->build($configuration);
+        return $configuration;
     }
 
     public function isOptional(): bool

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Extension;
 
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
+use Symfony\Component\Config\Builder\ConfigFunctionGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -58,7 +59,7 @@ trait ExtensionTrait
             new XmlFileLoader($container, $locator, $env, $prepend),
             new YamlFileLoader($container, $locator, $env, $prepend),
             new IniFileLoader($container, $locator, $env),
-            new PhpFileLoader($container, $locator, $env, new ConfigBuilderGenerator($buildDir), $prepend),
+            new PhpFileLoader($container, $locator, $env, new ConfigBuilderGenerator($buildDir), $prepend, new ConfigFunctionGenerator($buildDir)),
             new GlobFileLoader($container, $locator, $env),
             new DirectoryLoader($container, $locator, $env),
             new ClosureLoader($container, $env),

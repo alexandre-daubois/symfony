@@ -3,6 +3,7 @@
 namespace Symfony\Config;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
@@ -11,6 +12,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuilderInterface
 {
     private $anyValue;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     /**
@@ -25,6 +27,18 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         $this->anyValue = $value;
 
         return $this;
+    }
+
+    /*
+     * @param array{
+     *     any_value?: mixed,
+     * } $config
+     */
+    public function configure(#[ArrayShape([
+        'any_value' => 'mixed',
+    ])] array $config = []): void
+    {
+        $this->configOutput = $config;
     }
 
     public function getExtensionAlias(): string
@@ -47,6 +61,10 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['anyValue'])) {
             $output['any_value'] = $this->anyValue;
