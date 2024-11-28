@@ -193,8 +193,10 @@ abstract class AbstractCloner implements ClonerInterface
         ':process' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castProcess'],
         ':stream' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'],
 
-        'OpenSSLCertificate' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslX509'],
-        ':OpenSSL X.509' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslX509'],
+        'OpenSSLAsymmetricKey' => ['Symfony\Component\VarDumper\Caster\OpenSslCaster', 'castOpensslAsymmetricKey'],
+        'OpenSSLCertificateSigningRequest' => ['Symfony\Component\VarDumper\Caster\OpenSslCaster', 'castOpensslCsr'],
+        'OpenSSLCertificate' => ['Symfony\Component\VarDumper\Caster\OpenSslCaster', 'castOpensslX509'],
+        ':OpenSSL X.509' => ['Symfony\Component\VarDumper\Caster\OpenSslCaster', 'castOpensslX509'],
 
         ':persistent stream' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'],
         ':stream-context' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStreamContext'],
