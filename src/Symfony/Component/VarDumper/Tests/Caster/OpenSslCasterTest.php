@@ -31,9 +31,9 @@ class OpenSslCasterTest extends TestCase
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
 OpenSSLAsymmetricKey {
-  +type: 0
-  +bits: 1024
-  +publicKey: {
+  type: 0
+  bits: 1024
+  publicKey: {
     size: 1024
     md5: %A
     sha1: %A
@@ -60,7 +60,7 @@ EODUMP, $key);
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
 OpenSSLCertificateSigningRequest {
-  +subject: {
+  subject: {
     countryName: "FR"
     stateOrProvinceName: "Ile-de-France"
     localityName: "Paris"
@@ -69,7 +69,7 @@ OpenSSLCertificateSigningRequest {
     commonName: "symfony.com"
     emailAddress: "test@symfony.com"
   }
-  +publicKey: {
+  publicKey: {
     size: 2048
     md5: %A
     sha1: %A

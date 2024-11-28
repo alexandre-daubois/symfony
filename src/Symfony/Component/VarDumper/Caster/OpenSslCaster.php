@@ -49,9 +49,9 @@ class OpenSslCaster
         $info = openssl_pkey_get_details($h);
 
         $a += [
-            'type' => new ConstStub($info['type'], $info['type']),
-            'bits' => new ConstStub($info['bits'], $info['bits']),
-            'publicKey' => new EnumStub([
+            Caster::PREFIX_VIRTUAL.'type' => new ConstStub($info['type'], $info['type']),
+            Caster::PREFIX_VIRTUAL.'bits' => new ConstStub($info['bits'], $info['bits']),
+            Caster::PREFIX_VIRTUAL.'publicKey' => new EnumStub([
                 'size' => new ConstStub($info['bits'], $info['bits']),
                 'md5' => new ConstStub(wordwrap(strtoupper(md5($info['key'])), 2, ':', true)),
                 'sha1' => new ConstStub(wordwrap(strtoupper(sha1($info['key'])), 2, ':', true)),
@@ -70,7 +70,7 @@ class OpenSslCaster
         $pin = openssl_pkey_get_details($key)['key'];
 
         $a += [
-            'subject' => new EnumStub(array_intersect_key($info, [
+            Caster::PREFIX_VIRTUAL.'subject' => new EnumStub(array_intersect_key($info, [
                 'organizationName' => true,
                 'commonName' => true,
                 'countryName' => true,
@@ -79,7 +79,7 @@ class OpenSslCaster
                 'organizationalUnitName' => true,
                 'emailAddress' => true,
             ])),
-            'publicKey' => new EnumStub([
+            Caster::PREFIX_VIRTUAL.'publicKey' => new EnumStub([
                 'size' => new ConstStub(openssl_pkey_get_details($key)['bits'], openssl_pkey_get_details($key)['bits']),
                 'md5' => new ConstStub(wordwrap(strtoupper(md5($pin)), 2, ':', true)),
                 'sha1' => new ConstStub(wordwrap(strtoupper(sha1($pin)), 2, ':', true)),
