@@ -210,6 +210,8 @@ abstract class AbstractCloner implements ClonerInterface
         'XmlParser' => ['Symfony\Component\VarDumper\Caster\XmlResourceCaster', 'castXml'],
         ':xml' => ['Symfony\Component\VarDumper\Caster\XmlResourceCaster', 'castXml'],
 
+        'Socket' => ['Symfony\Component\VarDumper\Caster\SocketCaster', 'castSocket'],
+
         'RdKafka' => ['Symfony\Component\VarDumper\Caster\RdKafkaCaster', 'castRdKafka'],
         'RdKafka\Conf' => ['Symfony\Component\VarDumper\Caster\RdKafkaCaster', 'castConf'],
         'RdKafka\KafkaConsumer' => ['Symfony\Component\VarDumper\Caster\RdKafkaCaster', 'castKafkaConsumer'],
