@@ -186,10 +186,16 @@ abstract class AbstractCloner implements ClonerInterface
         'GdImage' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castGd'],
         ':gd' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castGd'],
 
+        'SQLite3Result' => ['Symfony\Component\VarDumper\Caster\SqliteCaster', 'castSqlite3Result'],
+
+        'PgSql\Lob' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLargeObject'],
         ':pgsql large object' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLargeObject'],
+        'PgSql\Connection' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLink'],
         ':pgsql link' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLink'],
         ':pgsql link persistent' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLink'],
+        'PgSql\Result' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castResult'],
         ':pgsql result' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castResult'],
+
         ':process' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castProcess'],
         ':stream' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'],
 
