@@ -22,11 +22,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ResourceCaster
 {
-    public static function castCurl(\CurlHandle $h, array $a, Stub $stub, bool $isNested): array
-    {
-        return curl_getinfo($h);
-    }
-
     public static function castDba($dba, array $a, Stub $stub, bool $isNested): array
     {
         $list = dba_list();

@@ -177,7 +177,8 @@ abstract class AbstractCloner implements ClonerInterface
 
         'mysqli_driver' => ['Symfony\Component\VarDumper\Caster\MysqliCaster', 'castMysqliDriver'],
 
-        'CurlHandle' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'],
+        'CurlHandle' => ['Symfony\Component\VarDumper\Caster\CurlCaster', 'castCurl'],
+        'CurlMultiHandle' => ['Symfony\Component\VarDumper\Caster\CurlCaster', 'castCurlMulti'],
 
         ':dba' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
         ':dba persistent' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
