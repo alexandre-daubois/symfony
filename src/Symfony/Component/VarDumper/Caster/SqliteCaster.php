@@ -15,17 +15,16 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
+ *
+ * @internal
  */
 final class SqliteCaster
 {
     public static function castSqlite3Result(\SQLite3Result $result, array $a, Stub $stub, bool $isNested): array
     {
-        $a += [
-            Caster::PREFIX_VIRTUAL.'numColumns' => $result->numColumns(),
-        ];
-
-        for ($i = 0; $i < $result->numColumns(); ++$i) {
-            $a[Caster::PREFIX_VIRTUAL.'columnName'][$i] = $result->columnName($i);
+        $numColumns = $result->numColumns();
+        for ($i = 0; $i < $numColumns; ++$i) {
+            $a[Caster::PREFIX_VIRTUAL.'columnNames'][$i] = $result->columnName($i);
         }
 
         return $a;

@@ -177,7 +177,7 @@ abstract class AbstractCloner implements ClonerInterface
 
         'mysqli_driver' => ['Symfony\Component\VarDumper\Caster\MysqliCaster', 'castMysqliDriver'],
 
-        'CurlHandle' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'],
+        'CurlHandle' => ['Symfony\Component\VarDumper\Caster\CurlCaster', 'castCurl'],
 
         'Dba\Connection' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
         ':dba' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
@@ -194,9 +194,9 @@ abstract class AbstractCloner implements ClonerInterface
         ':process' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castProcess'],
         ':stream' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'],
 
-        'OpenSSLAsymmetricKey' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslAsymmetricKey'],
-        'OpenSSLCertificateSigningRequest' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslCsr'],
-        'OpenSSLCertificate' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslX509'],
+        'OpenSSLAsymmetricKey' => ['Symfony\Component\VarDumper\Caster\OpenSSLCaster', 'castOpensslAsymmetricKey'],
+        'OpenSSLCertificateSigningRequest' => ['Symfony\Component\VarDumper\Caster\OpenSSLCaster', 'castOpensslCsr'],
+        'OpenSSLCertificate' => ['Symfony\Component\VarDumper\Caster\OpenSSLCaster', 'castOpensslX509'],
 
         ':persistent stream' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'],
         ':stream-context' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStreamContext'],

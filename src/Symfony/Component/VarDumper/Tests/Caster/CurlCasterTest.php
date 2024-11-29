@@ -15,28 +15,25 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
- * @requires extension sqlite3
+ * @requires extension curl
  */
-class SqliteCasterTest extends TestCase
+class CurlCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testSqlite3Result()
+    public function testCastCurl()
     {
-        $db = new \SQLite3(':memory:');
-        $db->exec('CREATE TABLE foo (id INTEGER PRIMARY KEY, bar TEXT)');
-        $db->exec('INSERT INTO foo (bar) VALUES ("baz")');
-        $stmt = $db->prepare('SELECT id, bar FROM foo');
-        $result = $stmt->execute();
+        $ch = curl_init('http://example.com');
+        curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
 
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
-SQLite3Result {
-  columnNames: array:2 [
-    0 => "id"
-    1 => "bar"
-  ]
+CurlHandle {
+  url: "http://example.com/"
+  content_type: "text/html; charset=UTF-8"
+  http_code: 200%A
 }
-EODUMP, $result);
+EODUMP, $ch);
     }
 }
