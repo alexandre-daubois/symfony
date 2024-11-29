@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `CurlCaster`, `OpenSslCaster`, `SqliteCaster`, `SocketCaster` and `DbaCaster`
+
 7.2
 ---
 

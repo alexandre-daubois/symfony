@@ -25,7 +25,7 @@ class OpenSslCasterTest extends TestCase
     {
         $key = openssl_pkey_new([
             'private_key_bits' => 1024,
-            'private_key_type' => OPENSSL_KEYTYPE_RSA,
+            'private_key_type' => \OPENSSL_KEYTYPE_RSA,
         ]);
 
         $this->assertDumpMatchesFormat(

@@ -20,6 +20,8 @@ class DbaCaster
 {
     public static function castDbaConnection(\Dba\Connection $dba, array $a, Stub $stub, bool $isNested): array
     {
+        // not yet possible to gather information about the connection object
+
         return $a;
     }
 

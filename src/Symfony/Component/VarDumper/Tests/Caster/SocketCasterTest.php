@@ -23,7 +23,7 @@ class SocketCasterTest extends TestCase
 
     public function testCastSocket()
     {
-        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        $socket = socket_create(\AF_INET, \SOCK_DGRAM, \SOL_UDP);
         @socket_connect($socket, '127.0.0.1', 80);
 
         $this->assertDumpMatchesFormat(
@@ -35,14 +35,11 @@ Socket {
     timed_out: false
     blocked: true
     eof: false
+    stream_type: "udp_socket"
+    mode: "r+"
     unread_bytes: 0
-    stream_type: udp_socket
-    wrapper_type: ?
-    wrapper_data: ?
-    mode: r+
     seekable: false
-    uri: udp://
-  }
+%A}
 }
 EODUMP, $socket);
     }
