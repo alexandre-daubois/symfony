@@ -22,14 +22,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ResourceCaster
 {
-    public static function castDba($dba, array $a, Stub $stub, bool $isNested): array
-    {
-        $list = dba_list();
-        $a['file'] = $list[(int) $dba];
-
-        return $a;
-    }
-
     public static function castProcess($process, array $a, Stub $stub, bool $isNested): array
     {
         return proc_get_status($process);
