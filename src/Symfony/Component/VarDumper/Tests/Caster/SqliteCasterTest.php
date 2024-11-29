@@ -33,9 +33,9 @@ class SqliteCasterTest extends TestCase
             <<<'EODUMP'
 SQLite3Result {
   numColumns: 2
-  result: array:2 [
-    "id" => 1
-    "bar" => "baz"
+  columnName: array:2 [
+    0 => "id"
+    1 => "bar"
   ]
 }
 EODUMP, $result);

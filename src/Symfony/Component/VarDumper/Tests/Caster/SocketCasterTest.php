@@ -31,15 +31,13 @@ class SocketCasterTest extends TestCase
 Socket {
   address: "127.0.0.1"
   port: %d
-  info: {
-    timed_out: false
-    blocked: true
-    eof: false
-    stream_type: "udp_socket"
-    mode: "r+"
-    unread_bytes: 0
-    seekable: false
-%A}
+  timed_out: false
+  blocked: true
+  eof: false
+  stream_type: "udp_socket"
+  mode: "r+"
+  unread_bytes: 0
+  seekable: false%A
 }
 EODUMP, $socket);
     }

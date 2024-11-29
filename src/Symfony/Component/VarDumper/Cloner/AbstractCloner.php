@@ -177,39 +177,31 @@ abstract class AbstractCloner implements ClonerInterface
 
         'mysqli_driver' => ['Symfony\Component\VarDumper\Caster\MysqliCaster', 'castMysqliDriver'],
 
-        'CurlHandle' => ['Symfony\Component\VarDumper\Caster\CurlCaster', 'castCurl'],
-        'CurlMultiHandle' => ['Symfony\Component\VarDumper\Caster\CurlCaster', 'castCurlMulti'],
+        'CurlHandle' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'],
 
-        'Dba\Connection' => ['Symfony\Component\VarDumper\Caster\DbaCaster', 'castDbaConnection'],
-        ':dba' => ['Symfony\Component\VarDumper\Caster\DbaCaster', 'castDbaResource'],
-        ':dba persistent' => ['Symfony\Component\VarDumper\Caster\DbaCaster', 'castDbaResource'],
+        'Dba\Connection' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
+        ':dba' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
+        ':dba persistent' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
 
         'GdImage' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castGd'],
-        ':gd' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castGd'],
 
         'SQLite3Result' => ['Symfony\Component\VarDumper\Caster\SqliteCaster', 'castSqlite3Result'],
 
         'PgSql\Lob' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLargeObject'],
-        ':pgsql large object' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLargeObject'],
         'PgSql\Connection' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLink'],
-        ':pgsql link' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLink'],
-        ':pgsql link persistent' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castLink'],
         'PgSql\Result' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castResult'],
-        ':pgsql result' => ['Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castResult'],
 
         ':process' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castProcess'],
         ':stream' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'],
 
-        'OpenSSLAsymmetricKey' => ['Symfony\Component\VarDumper\Caster\OpenSslCaster', 'castOpensslAsymmetricKey'],
-        'OpenSSLCertificateSigningRequest' => ['Symfony\Component\VarDumper\Caster\OpenSslCaster', 'castOpensslCsr'],
-        'OpenSSLCertificate' => ['Symfony\Component\VarDumper\Caster\OpenSslCaster', 'castOpensslX509'],
-        ':OpenSSL X.509' => ['Symfony\Component\VarDumper\Caster\OpenSslCaster', 'castOpensslX509'],
+        'OpenSSLAsymmetricKey' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslAsymmetricKey'],
+        'OpenSSLCertificateSigningRequest' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslCsr'],
+        'OpenSSLCertificate' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslX509'],
 
         ':persistent stream' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'],
         ':stream-context' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStreamContext'],
 
         'XmlParser' => ['Symfony\Component\VarDumper\Caster\XmlResourceCaster', 'castXml'],
-        ':xml' => ['Symfony\Component\VarDumper\Caster\XmlResourceCaster', 'castXml'],
 
         'Socket' => ['Symfony\Component\VarDumper\Caster\SocketCaster', 'castSocket'],
 

@@ -4,7 +4,7 @@ CHANGELOG
 7.3
 ---
 
- * Add `CurlCaster`, `OpenSslCaster`, `SqliteCaster`, `SocketCaster` and `DbaCaster`
+ * Add casters for `Dba\Connection`, `SQLite3Result`, `OpenSSLAsymmetricKey` and `OpenSSLCertificateSigningRequest`
 
 7.2
 ---

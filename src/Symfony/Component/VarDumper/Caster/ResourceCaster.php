@@ -22,6 +22,32 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ResourceCaster
 {
+    public static function castCurl(\CurlHandle $h, array $a, Stub $stub, bool $isNested): array
+    {
+        $info = curl_getinfo($h);
+        foreach ($info as $key => $val) {
+            $a[Caster::PREFIX_VIRTUAL.$key] = $val;
+        }
+
+        return $a;
+    }
+
+    /**
+     * @param resource|\Dba\Connection $dba
+     */
+    public static function castDba($dba, array $a, Stub $stub, bool $isNested): array
+    {
+        if (\PHP_VERSION_ID < 80402 && !\is_resource($dba)) {
+            // @see https://github.com/php/php-src/issues/16990
+            return $a;
+        }
+
+        $list = dba_list();
+        $a['file'] = $list[(int) $dba];
+
+        return $a;
+    }
+
     public static function castProcess($process, array $a, Stub $stub, bool $isNested): array
     {
         return proc_get_status($process);
@@ -42,10 +68,62 @@ class ResourceCaster
         return @stream_context_get_params($stream) ?: $a;
     }
 
+    /**
+     * @param \GdImage $gd
+     */
     public static function castGd($gd, array $a, Stub $stub, bool $isNested): array
     {
         $a['size'] = imagesx($gd).'x'.imagesy($gd);
         $a['trueColor'] = imageistruecolor($gd);
+
+        return $a;
+    }
+
+    /**
+     * @param \OpenSSLCertificate $h
+     */
+    public static function castOpensslX509($h, array $a, Stub $stub, bool $isNested): array
+    {
+        $stub->cut = -1;
+        $info = openssl_x509_parse($h, false);
+
+        $pin = openssl_pkey_get_public($h);
+        $pin = openssl_pkey_get_details($pin)['key'];
+        $pin = \array_slice(explode("\n", $pin), 1, -2);
+        $pin = base64_decode(implode('', $pin));
+        $pin = base64_encode(hash('sha256', $pin, true));
+
+        $a += [
+            'subject' => new EnumStub(array_intersect_key($info['subject'], ['organizationName' => true, 'commonName' => true])),
+            'issuer' => new EnumStub(array_intersect_key($info['issuer'], ['organizationName' => true, 'commonName' => true])),
+            'expiry' => new ConstStub(date(\DateTimeInterface::ISO8601, $info['validTo_time_t']), $info['validTo_time_t']),
+            'fingerprint' => new EnumStub([
+                'md5' => new ConstStub(wordwrap(strtoupper(openssl_x509_fingerprint($h, 'md5')), 2, ':', true)),
+                'sha1' => new ConstStub(wordwrap(strtoupper(openssl_x509_fingerprint($h, 'sha1')), 2, ':', true)),
+                'sha256' => new ConstStub(wordwrap(strtoupper(openssl_x509_fingerprint($h, 'sha256')), 2, ':', true)),
+                'pin-sha256' => new ConstStub($pin),
+            ]),
+        ];
+
+        return $a;
+    }
+
+    public static function castOpensslAsymmetricKey(\OpenSSLAsymmetricKey $key, array $a, Stub $stub, bool $isNested): array
+    {
+        foreach (openssl_pkey_get_details($key) as $k => $v) {
+            $a[Caster::PREFIX_VIRTUAL.$k] = $v;
+        }
+
+        unset($a[Caster::PREFIX_VIRTUAL.'rsa']); // binary data
+
+        return $a;
+    }
+
+    public static function castOpensslCsr(\OpenSSLCertificateSigningRequest $csr, array $a, Stub $stub, bool $isNested): array
+    {
+        foreach (openssl_csr_get_subject($csr, false) as $k => $v) {
+            $a[Caster::PREFIX_VIRTUAL.$k] = $v;
+        }
 
         return $a;
     }

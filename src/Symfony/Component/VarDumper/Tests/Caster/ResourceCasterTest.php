@@ -14,12 +14,25 @@ namespace Symfony\Component\VarDumper\Tests\Caster;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires extension openssl
- */
-class OpenSslCasterTest extends TestCase
+class ResourceCasterTest extends TestCase
 {
     use VarDumperTestTrait;
+
+    public function testCastCurl()
+    {
+        $ch = curl_init('http://example.com');
+        curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+
+        $this->assertDumpMatchesFormat(
+            <<<'EODUMP'
+CurlHandle {
+  url: "http://example.com/"
+  content_type: "text/html; charset=UTF-8"
+  http_code: 200%A
+}
+EODUMP, $ch);
+    }
 
     public function testAsymmetricKey()
     {
@@ -31,14 +44,16 @@ class OpenSslCasterTest extends TestCase
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
 OpenSSLAsymmetricKey {
-  type: 0
   bits: 1024
-  publicKey: {
-    size: 1024
-    md5: %A
-    sha1: %A
-    sha256: %A
-  }
+  key: """
+    -----BEGIN PUBLIC KEY-----\n
+    %A
+    %A
+    %A
+    %A
+    -----END PUBLIC KEY-----\n
+    """
+  type: 0
 }
 EODUMP, $key);
     }
@@ -60,22 +75,29 @@ EODUMP, $key);
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
 OpenSSLCertificateSigningRequest {
-  subject: {
-    countryName: "FR"
-    stateOrProvinceName: "Ile-de-France"
-    localityName: "Paris"
-    organizationName: "Symfony"
-    organizationalUnitName: "Security"
-    commonName: "symfony.com"
-    emailAddress: "test@symfony.com"
-  }
-  publicKey: {
-    size: 2048
-    md5: %A
-    sha1: %A
-    sha256: %A
-  }
+  countryName: "FR"
+  stateOrProvinceName: "Ile-de-France"
+  localityName: "Paris"
+  organizationName: "Symfony"
+  organizationalUnitName: "Security"
+  commonName: "symfony.com"
+  emailAddress: "test@symfony.com"
 }
 EODUMP, $csr);
+    }
+
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastDbaPriorToPhp84()
+    {
+        $dba = dba_open(sys_get_temp_dir().'/test.db', 'c');
+
+        $this->assertDumpMatchesFormat(
+            <<<'EODUMP'
+dba resource {
+  file: %s
+}
+EODUMP, $dba);
     }
 }
