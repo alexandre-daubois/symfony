@@ -45,7 +45,7 @@ trait WrappedExceptionsTrait
         $unwrapped = [];
         foreach ($exceptions as $key => $exception) {
             if ($recursive && $exception instanceof WrappedExceptionsInterface) {
-                $unwrapped[] = $this->getWrappedExceptionsRecursively($class, $recursive, $exception->getWrappedExceptions());
+                $unwrapped[] = $this->getWrappedExceptionsRecursively($class, true, $exception->getWrappedExceptions());
 
                 continue;
             }

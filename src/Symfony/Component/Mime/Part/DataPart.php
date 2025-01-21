@@ -150,9 +150,6 @@ class DataPart extends TextPart
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
 
-        if (!\is_array($this->_parent)) {
-            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-        }
         foreach (['body', 'charset', 'subtype', 'disposition', 'name', 'encoding'] as $name) {
             if (null !== $this->_parent[$name] && !\is_string($this->_parent[$name]) && !$this->_parent[$name] instanceof File) {
                 throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);

@@ -184,7 +184,7 @@ class PrototypedArrayNode extends ArrayNode
     protected function normalizeValue(mixed $value): mixed
     {
         if (false === $value) {
-            return $value;
+            return false;
         }
 
         $value = $this->remapXml($value);

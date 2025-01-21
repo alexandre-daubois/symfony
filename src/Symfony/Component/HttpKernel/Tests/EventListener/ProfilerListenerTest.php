@@ -47,8 +47,7 @@ class ProfilerListenerTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($mainRequest);
 
-        $onlyException = true;
-        $listener = new ProfilerListener($profiler, $requestStack, null, $onlyException);
+        $listener = new ProfilerListener($profiler, $requestStack, null, true);
 
         // main request
         $listener->onKernelResponse(new ResponseEvent($kernel, $mainRequest, Kernel::MAIN_REQUEST, $response));

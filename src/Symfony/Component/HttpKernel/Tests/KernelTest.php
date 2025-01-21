@@ -45,11 +45,10 @@ class KernelTest extends TestCase
     public function testConstructor()
     {
         $env = 'test_env';
-        $debug = true;
-        $kernel = new KernelForTest($env, $debug);
+        $kernel = new KernelForTest($env, true);
 
         $this->assertEquals($env, $kernel->getEnvironment());
-        $this->assertEquals($debug, $kernel->isDebug());
+        $this->assertTrue($kernel->isDebug());
         $this->assertFalse($kernel->isBooted());
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
     }
@@ -65,13 +64,12 @@ class KernelTest extends TestCase
     public function testClone()
     {
         $env = 'test_env';
-        $debug = true;
-        $kernel = new KernelForTest($env, $debug);
+        $kernel = new KernelForTest($env, true);
 
         $clone = clone $kernel;
 
         $this->assertEquals($env, $clone->getEnvironment());
-        $this->assertEquals($debug, $clone->isDebug());
+        $this->assertTrue($clone->isDebug());
         $this->assertFalse($clone->isBooted());
         $this->assertLessThanOrEqual(microtime(true), $clone->getStartTime());
     }
@@ -242,9 +240,7 @@ class KernelTest extends TestCase
 
     public function testSerialize()
     {
-        $env = 'test_env';
-        $debug = true;
-        $kernel = new KernelForTest($env, $debug);
+        $kernel = new KernelForTest('test_env', true);
         $expected = \sprintf("O:48:\"%s\":2:{s:14:\"\0*\0environment\";s:8:\"test_env\";s:8:\"\0*\0debug\";b:1;}", KernelForTest::class);
         $this->assertEquals($expected, serialize($kernel));
     }

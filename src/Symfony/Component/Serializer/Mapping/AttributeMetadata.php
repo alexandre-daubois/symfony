@@ -209,8 +209,8 @@ class AttributeMetadata implements AttributeMetadataInterface
             $this->denormalizationContexts = $attributeMetadata->getDenormalizationContexts();
         }
 
-        if ($ignore = $attributeMetadata->isIgnored()) {
-            $this->ignore = $ignore;
+        if ($attributeMetadata->isIgnored()) {
+            $this->ignore = true;
         }
     }
 

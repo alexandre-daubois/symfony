@@ -94,7 +94,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
-        $resolver->setAllowedTypes($option = 'foo', $allowedTypes = ['string', 'bool']);
+        $resolver->setAllowedTypes('foo', $allowedTypes = ['string', 'bool']);
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame($allowedTypes, $debug->getAllowedTypes($option));
@@ -125,7 +125,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
-        $resolver->setAllowedValues($option = 'foo', $allowedValues = ['bar', 'baz']);
+        $resolver->setAllowedValues('foo', $allowedValues = ['bar', 'baz']);
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame($allowedValues, $debug->getAllowedValues($option));
@@ -156,7 +156,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
-        $resolver->setNormalizer($option = 'foo', $normalizer = function () {});
+        $resolver->setNormalizer('foo', $normalizer = function () {});
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame($normalizer, $debug->getNormalizer($option));

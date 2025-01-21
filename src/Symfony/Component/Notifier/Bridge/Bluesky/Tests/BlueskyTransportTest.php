@@ -135,14 +135,12 @@ final class BlueskyTransportTest extends TransportTestCase
     public function testParseFacetsInvalidHandle()
     {
         $input = '@bare';
-        $expected = [];
         $output = $this->parseFacets($input, new MockHttpClient([new JsonMockResponse(['did' => 'no_value'])]));
-        $this->assertEquals($expected, $output);
+        $this->assertEmpty($output);
 
         $input = 'email@example.com';
-        $expected = [];
         $output = $this->parseFacets($input, new MockHttpClient([new JsonMockResponse(['did' => 'no_value'])]));
-        $this->assertEquals($expected, $output);
+        $this->assertEmpty($output);
     }
 
     /**
@@ -216,9 +214,9 @@ final class BlueskyTransportTest extends TransportTestCase
         $this->assertEquals($expected, $output);
 
         $input = 'runonhttp://blah.comcontinuesafter';
-        $expected = [];
         $output = $this->parseFacets($input);
-        $this->assertEquals($expected, $output);
+
+        $this->assertEmpty($output);
     }
 
     /**

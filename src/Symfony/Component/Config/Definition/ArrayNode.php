@@ -257,7 +257,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected function normalizeValue(mixed $value): mixed
     {
         if (false === $value) {
-            return $value;
+            return false;
         }
 
         $value = $this->remapXml($value);
