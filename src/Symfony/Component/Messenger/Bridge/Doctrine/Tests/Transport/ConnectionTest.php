@@ -321,12 +321,20 @@ class ConnectionTest extends TestCase
             ->with('id = ?')
             ->willReturnSelf();
 
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('SELECT 1 FROM messenger_messages');
+
         $driverConnection->expects($this->once())
             ->method('beginTransaction');
 
         $driverConnection->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->willReturn(1);
 
         $driverConnection->expects($this->once())
             ->method('commit');
@@ -355,6 +363,10 @@ class ConnectionTest extends TestCase
             ->method('where')
             ->with('id = ?')
             ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('SELECT 1 FROM messenger_messages');
 
         $driverConnection->expects($this->once())
             ->method('beginTransaction');
