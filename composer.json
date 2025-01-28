@@ -84,6 +84,7 @@
         "symfony/http-kernel": "self.version",
         "symfony/intl": "self.version",
         "symfony/json-encoder": "self.version",
+        "symfony/json-path": "self.version",
         "symfony/ldap": "self.version",
         "symfony/lock": "self.version",
         "symfony/mailer": "self.version",
