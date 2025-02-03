@@ -19,6 +19,9 @@
         "php": ">=8.2",
         "symfony/polyfill-mbstring": "~1.0"
     },
+    "require-dev": {
+        "symfony/json-encoder": "^7.3"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\JsonPath\\": "" },
         "exclude-from-classmap": [

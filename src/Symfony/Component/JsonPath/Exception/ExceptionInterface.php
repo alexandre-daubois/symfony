@@ -16,10 +16,6 @@ namespace Symfony\Component\JsonPath\Exception;
  *
  * @experimental
  */
-class JsonCrawlerException extends \RuntimeException implements ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
-    public function __construct(string $path, string $message, ?\Throwable $previous = null)
-    {
-        parent::__construct(\sprintf('Error while crawling JSON with JSON path "%s": %s.', $path, $message), previous: $previous);
-    }
 }

@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\JsonPath;
 
+use Symfony\Component\JsonEncoder\Decode\Splitter;
+use Symfony\Component\JsonPath\Exception\InvalidArgumentException;
 use Symfony\Component\JsonPath\Exception\InvalidInputJsonException;
-use Symfony\Component\JsonPath\Exception\InvalidJsonPathException;
 use Symfony\Component\JsonPath\Exception\JsonCrawlerException;
 use Symfony\Component\JsonPath\Tokenizer\JsonPathToken;
 use Symfony\Component\JsonPath\Tokenizer\JsonPathTokenizer;
@@ -37,14 +38,14 @@ final class JsonCrawler implements JsonCrawlerInterface
         'value' => true,
     ];
 
-    private mixed $data;
-
-    public function __construct(string $json)
-    {
-        try {
-            $this->data = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
-            throw new InvalidInputJsonException($e->getMessage(), $e);
+    /**
+     * @param resource|string $raw
+     */
+    public function __construct(
+        private readonly mixed $raw,
+    ) {
+        if (!\is_string($raw) && !\is_resource($raw)) {
+            throw new InvalidArgumentException(\sprintf('Expected string or resource, got "%s".', get_debug_type($raw)));
         }
     }
 
@@ -57,7 +58,29 @@ final class JsonCrawler implements JsonCrawlerInterface
     {
         try {
             $tokens = JsonPathTokenizer::tokenize($query);
-            $current = [$this->data];
+            $json = $this->raw;
+
+            if (\is_resource($this->raw)) {
+                if (!class_exists(Splitter::class)) {
+                    throw new \LogicException('The JsonEncoder package is required to use the JsonCrawler with a resource. Try running "composer require symfony/json-encoder".');
+                }
+
+                $simplified = JsonPathUtils::findSmallestDeserializableStringAndPath(
+                    $tokens,
+                    $this->raw,
+                );
+
+                $tokens = $simplified['tokens'];
+                $json = $simplified['json'];
+            }
+
+            try {
+                $data = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new InvalidInputJsonException($e->getMessage(), $e);
+            }
+
+            $current = [$data];
 
             foreach ($tokens as $token) {
                 $next = [];
@@ -70,7 +93,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             }
 
             return $current;
-        } catch (InvalidJsonPathException $e) {
+        } catch (InvalidArgumentException $e) {
             throw $e;
         } catch (\Throwable $e) {
             throw new JsonCrawlerException($query, $e->getMessage(), previous: $e);

@@ -19,7 +19,7 @@ namespace Symfony\Component\JsonPath;
 interface JsonCrawlerInterface
 {
     /**
-     * @return array<array|string|float|int|bool|null>
+     * @return list<array|string|float|int|bool|null>
      */
     public function find(string|JsonPath $query): array;
 }

@@ -12,9 +12,11 @@
 namespace Symfony\Component\JsonPath\Exception;
 
 /**
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
+ *
  * @experimental
  */
-class InvalidJsonPathException extends \RuntimeException
+class InvalidJsonPathException extends \LogicException implements ExceptionInterface
 {
     public function __construct(string $message, ?int $position = null)
     {

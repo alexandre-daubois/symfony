@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonPath\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\JsonPath\Exception\InvalidArgumentException;
 use Symfony\Component\JsonPath\Exception\InvalidInputJsonException;
 use Symfony\Component\JsonPath\Exception\JsonCrawlerException;
 use Symfony\Component\JsonPath\JsonCrawler;
@@ -19,12 +20,20 @@ use Symfony\Component\JsonPath\JsonPath;
 
 class JsonCrawlerTest extends TestCase
 {
+    public function testNotStringOrResourceThrows()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected string or resource, got "int".');
+
+        new JsonCrawler(42);
+    }
+
     public function testInvalidInputJson()
     {
         $this->expectException(InvalidInputJsonException::class);
         $this->expectExceptionMessage('Invalid input JSON: Syntax error.');
 
-        new JsonCrawler('invalid');
+        (new JsonCrawler('invalid'))->find('$..*');
     }
 
     public function testAllAuthors()
