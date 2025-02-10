@@ -277,4 +277,19 @@ final class BlueskyTransportTest extends TransportTestCase
 
         return $method->invoke($object, $input);
     }
+
+    public function testUriIsSetAsMessageId()
+    {
+        $client = new MockHttpClient(function () {
+            return new JsonMockResponse([
+                'uri' => 'https://example.com',
+                'cid' => 'my_cid',
+            ]);
+        });
+
+        $transport = self::createTransport($client);
+        $message = $transport->send(new ChatMessage('Hello!'));
+
+        $this->assertSame('https://example.com', $message->getMessageId());
+    }
 }
