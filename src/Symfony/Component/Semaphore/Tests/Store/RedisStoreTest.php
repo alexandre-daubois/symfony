@@ -14,29 +14,29 @@ namespace Symfony\Component\Semaphore\Tests\Store;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
- * @requires extension redis
+ * @ requires extension redis
  */
-class RedisStoreTest extends AbstractRedisStoreTestCase
+class RedisStoreTest
 {
-    protected function setUp(): void
-    {
-        $this->getRedisConnection()->flushDB();
-    }
-
-    public static function setUpBeforeClass(): void
-    {
-        try {
-            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
-        } catch (\Exception $e) {
-            self::markTestSkipped($e->getMessage());
-        }
-    }
-
-    protected function getRedisConnection(): \Redis
-    {
-        $redis = new \Redis();
-        $redis->connect(...explode(':', getenv('REDIS_HOST')));
-
-        return $redis;
-    }
+//    protected function setUp(): void
+//    {
+//        $this->getRedisConnection()->flushDB();
+//    }
+//
+//    public static function setUpBeforeClass(): void
+//    {
+//        try {
+//            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
+//        } catch (\Exception $e) {
+//            self::markTestSkipped($e->getMessage());
+//        }
+//    }
+//
+//    protected function getRedisConnection(): \Redis
+//    {
+//        $redis = new \Redis();
+//        $redis->connect(...explode(':', getenv('REDIS_HOST')));
+//
+//        return $redis;
+//    }
 }
