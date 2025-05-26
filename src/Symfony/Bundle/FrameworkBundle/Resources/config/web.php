@@ -29,6 +29,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolv
 use Symfony\Component\HttpKernel\Controller\ErrorController;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
+use Symfony\Component\HttpKernel\EventListener\CollectGcCyclesListener;
 use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
@@ -122,6 +123,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
 
         ->set('disallow_search_engine_index_response_listener', DisallowRobotsIndexingListener::class)
+            ->tag('kernel.event_subscriber')
+
+        ->set('gc_collect_cycles_terminate_listener', CollectGcCyclesListener::class)
             ->tag('kernel.event_subscriber')
 
         ->set('error_controller', ErrorController::class)

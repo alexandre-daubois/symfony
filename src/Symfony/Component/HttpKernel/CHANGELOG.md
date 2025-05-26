@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add automatic GC collection on kernel terminate event when worker mode is detected
+
 7.3
 ---
 
@@ -8,7 +13,7 @@ CHANGELOG
  * Support `Uid` in `#[MapQueryParameter]`
  * Add `ServicesResetterInterface`, implemented by `ServicesResetter`
  * Allow configuring the logging channel per type of exceptions in ErrorListener
- 
+
 7.2
 ---
 
