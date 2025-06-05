@@ -159,4 +159,18 @@ final class JsonPathUtils
 
         return mb_chr($codepoint, 'UTF-8');
     }
+
+    /**
+     * @see https://datatracker.ietf.org/doc/rfc9535/, section 2.1.1
+     */
+    public static function normalizeWhitespace(string $input): string
+    {
+        $normalized = strtr($input, [
+            "\t" => ' ',
+            "\n" => ' ',
+            "\r" => ' ',
+        ]);
+
+        return trim($normalized);
+    }
 }

@@ -133,6 +133,14 @@ final class JsonCrawler implements JsonCrawlerInterface
             return [];
         }
 
+        if (str_contains($expr, ',')) {
+            $trimmed = trim($expr);
+            if (str_starts_with($trimmed, ',') || str_ends_with($trimmed, ',')) {
+                throw new JsonCrawlerException($expr, 'Expression cannot have leading or trailing commas');
+            }
+        }
+
+        $expr = JsonPathUtils::normalizeWhitespace($expr);
         if ('*' === $expr) {
             return array_values($value);
         }
@@ -168,8 +176,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             return $result;
         }
 
-        // start, end and step
-        if (preg_match('/^(-?\d*):(-?\d*)(?::(-?\d+))?$/', $expr, $matches)) {
+        if (preg_match('/^(-?\d*+)\s*+:\s*+(-?\d*+)(?:\s*+:\s*+(-?\d++))?$/', $expr, $matches)) {
             if (!array_is_list($value)) {
                 return [];
             }
@@ -217,14 +224,14 @@ final class JsonCrawler implements JsonCrawlerInterface
 
         // filter expressions
         if (preg_match('/^\?(.*)$/', $expr, $matches)) {
-            $filterExpr = $matches[1];
+            $filterExpr = trim($matches[1]);
 
             if (preg_match('/^(\w+)\s*\([^()]*\)\s*([<>=!]+.*)?$/', $filterExpr)) {
                 $filterExpr = "($filterExpr)";
             }
 
             if (!str_starts_with($filterExpr, '(')) {
-                throw new JsonCrawlerException($expr, 'Invalid filter expression');
+                $filterExpr = "($filterExpr)";
             }
 
             // remove outer filter parentheses
@@ -238,44 +245,50 @@ final class JsonCrawler implements JsonCrawlerInterface
             $parts = $this->parseCommaSeparatedValues($expr);
 
             $result = [];
-            $keysIndices = array_keys($value);
-            $isList = array_is_list($value);
 
             foreach ($parts as $part) {
                 $part = trim($part);
 
-                if (preg_match('/^([\'"])(.*)\1$/', $part, $matches)) {
+                // Handle each part as a separate bracket expression
+                if ('*' === $part) {
+                    // Wildcard - add all values
+                    $result = array_merge($result, array_values($value));
+                } elseif (preg_match('/^(-?\d*+)\s*+:\s*+(-?\d*+)(?:\s*+:\s*+(-?\d++))?$/', $part, $matches)) {
+                    // Slice notation like 0:2, :3, 1:, etc.
+                    $sliceResult = $this->evaluateBracket($part, $value);
+                    $result = array_merge($result, $sliceResult);
+                } elseif (preg_match('/^([\'"])(.*)\1$/', $part, $matches)) {
+                    // Quoted string
                     $key = JsonPathUtils::unescapeString($matches[2], $matches[1]);
 
-                    if ($isList) {
+                    if (array_is_list($value)) {
+                        // For arrays, find ALL objects that contain this key
                         foreach ($value as $item) {
                             if (\is_array($item) && \array_key_exists($key, $item)) {
                                 $result[] = $item;
-                                break;
                             }
                         }
-
-                        continue; // no results here
-                    }
-
-                    if (\array_key_exists($key, $value)) {
-                        $result[] = $value[$key];
+                    } else {
+                        // For objects, get the value for this key
+                        if (\array_key_exists($key, $value)) {
+                            $result[] = $value[$key];
+                        }
                     }
                 } elseif (preg_match('/^-?\d+$/', $part)) {
-                    // numeric index
+                    // Numeric index
                     $index = (int) $part;
                     if ($index < 0) {
                         $index = \count($value) + $index;
                     }
 
-                    if ($isList && \array_key_exists($index, $value)) {
+                    if (array_is_list($value) && \array_key_exists($index, $value)) {
                         $result[] = $value[$index];
-                        continue;
-                    }
-
-                    // numeric index on a hashmap
-                    if (isset($keysIndices[$index]) && isset($value[$keysIndices[$index]])) {
-                        $result[] = $value[$keysIndices[$index]];
+                    } else {
+                        // numeric index on a hashmap
+                        $keysIndices = array_keys($value);
+                        if (isset($keysIndices[$index]) && isset($value[$keysIndices[$index]])) {
+                            $result[] = $value[$keysIndices[$index]];
+                        }
                     }
                 }
             }
@@ -310,12 +323,37 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function evaluateFilterExpression(string $expr, mixed $context): bool
     {
-        $expr = trim($expr);
+        $expr = JsonPathUtils::normalizeWhitespace($expr);
+
+        // remove outer parentheses if they wrap the entire expression
+        if (str_starts_with($expr, '(') && str_ends_with($expr, ')')) {
+            $depth = 0;
+            $isWrapped = true;
+            for ($i = 0; $i < strlen($expr); $i++) {
+                if ($expr[$i] === '(') {
+                    $depth++;
+                } elseif ($expr[$i] === ')') {
+                    $depth--;
+                    if ($depth === 0 && $i < strlen($expr) - 1) {
+                        $isWrapped = false;
+                        break;
+                    }
+                }
+            }
+            if ($isWrapped) {
+                $expr = trim(substr($expr, 1, -1));
+            }
+        }
+
+        if (str_starts_with($expr, '!')) {
+            $innerExpr = trim(substr($expr, 1));
+            return !$this->evaluateFilterExpression($innerExpr, $context);
+        }
 
         if (str_contains($expr, '&&')) {
             $parts = array_map('trim', explode('&&', $expr));
             foreach ($parts as $part) {
-                if (!$this->evaluateFilterExpression($part, $context)) {
+                if (!$this->evaluateFilterExpression(trim($part), $context)) {
                     return false;
                 }
             }
@@ -327,7 +365,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             $parts = array_map('trim', explode('||', $expr));
             $result = false;
             foreach ($parts as $part) {
-                $result = $result || $this->evaluateFilterExpression($part, $context);
+                $result = $result || $this->evaluateFilterExpression(trim($part), $context);
             }
 
             return $result;
@@ -353,8 +391,8 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         // function calls
-        if (preg_match('/^(\w+)\((.*)\)$/', $expr, $matches)) {
-            $functionName = $matches[1];
+        if (preg_match('/^(\w++)\s*+\((.*)\)$/', $expr, $matches)) {
+            $functionName = trim($matches[1]);
             if (!isset(self::RFC9535_FUNCTIONS[$functionName])) {
                 throw new JsonCrawlerException($expr, \sprintf('invalid function "%s"', $functionName));
             }
@@ -369,8 +407,16 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function evaluateScalar(string $expr, mixed $context): mixed
     {
-        if (is_numeric($expr)) {
-            return str_contains($expr, '.') ? (float) $expr : (int) $expr;
+        $expr = JsonPathUtils::normalizeWhitespace($expr);
+
+        // RFC 9535 compliant number validation using strict JSON number format
+        if (preg_match('/^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/', $expr)) {
+            return str_contains($expr, '.') || str_contains(strtolower($expr), 'e') ? (float) $expr : (int) $expr;
+        }
+
+        // only validate tokens that look like standalone numbers
+        if (preg_match('/^[\d+\-.eE]+$/', $expr) && preg_match('/\d/', $expr)) {
+            throw new JsonCrawlerException($expr, \sprintf('Invalid number format "%s"', $expr));
         }
 
         if ('@' === $expr) {
@@ -404,8 +450,8 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         // function calls
-        if (preg_match('/^(\w+)\((.*)\)$/', $expr, $matches)) {
-            $functionName = $matches[1];
+        if (preg_match('/^(\w++)\((.*)\)$/', $expr, $matches)) {
+            $functionName = trim($matches[1]);
             if (!isset(self::RFC9535_FUNCTIONS[$functionName])) {
                 throw new JsonCrawlerException($expr, \sprintf('invalid function "%s"', $functionName));
             }
@@ -416,14 +462,48 @@ final class JsonCrawler implements JsonCrawlerInterface
         return null;
     }
 
-    private function evaluateFunction(string $name, string $args, array $context): mixed
+    private function evaluateFunction(string $name, string $args, mixed $context): mixed
     {
-        $args = array_map(
-            fn ($arg) => $this->evaluateScalar(trim($arg), $context),
-            explode(',', $args)
-        );
+        $argList = [];
+        $nodelistSizes = [];
+        if (trim($args)) {
+            $args = $this->parseCommaSeparatedValues(trim($args));
+            foreach ($args as $arg) {
+                $arg = trim($arg);
+                if (str_starts_with($arg, '@')) { // special handling for @ to track nodelist size
+                    if ('@' === $arg) {
+                        $argList[] = $context;
+                        $nodelistSizes[] = 1;
+                    } elseif (!\is_array($context)) {
+                        $argList[] = null;
+                        $nodelistSizes[] = 0;
+                    } else {
+                        $pathPart = substr($arg, 1);
+                        if (str_starts_with($pathPart, '[')) {
+                            // Handle bracket expressions like @['a','d']
+                            $results = $this->evaluateBracket(substr($pathPart, 1, -1), $context);
+                            $argList[] = $results;
+                            $nodelistSizes[] = \count($results);
+                        } else {
+                            // Handle dot notation like @.a
+                            $results = $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.$pathPart)), $context);
+                            $argList[] = $results[0] ?? null;
+                            $nodelistSizes[] = \count($results);
+                        }
+                    }
+                } elseif (str_starts_with($arg, '$')) { // special handling for absolute paths
+                    $results = $this->evaluate(new JsonPath($arg));
+                    $argList[] = $results[0] ?? null;
+                    $nodelistSizes[] = \count($results);
+                } else {
+                    $argList[] = $this->evaluateScalar($arg, $context);
+                    $nodelistSizes[] = 1;
+                }
+            }
+        }
 
-        $value = $args[0] ?? null;
+        $value = $argList[0] ?? null;
+        $nodelistSize = $nodelistSizes[0] ?? 0;
 
         return match ($name) {
             'length' => match (true) {
@@ -431,16 +511,16 @@ final class JsonCrawler implements JsonCrawlerInterface
                 \is_array($value) => \count($value),
                 default => 0,
             },
-            'count' => \is_array($value) ? \count($value) : 0,
+            'count' => $nodelistSize,
             'match' => match (true) {
-                \is_string($value) && \is_string($args[1] ?? null) => (bool) @preg_match(\sprintf('/^%s$/', $args[1]), $value),
+                \is_string($value) && \is_string($argList[1] ?? null) => (bool) @preg_match(\sprintf('/^%s$/u', $this->transformJsonPathRegex($argList[1])), $value),
                 default => false,
             },
             'search' => match (true) {
-                \is_string($value) && \is_string($args[1] ?? null) => (bool) @preg_match("/$args[1]/", $value),
+                \is_string($value) && \is_string($argList[1] ?? null) => (bool) @preg_match("/{$this->transformJsonPathRegex($argList[1])}/u", $value),
                 default => false,
             },
-            'value' => $value,
+            'value' => 1 < $nodelistSize ? null : (1 === $nodelistSize ? (\is_array($value) ? ($value[0] ?? null) : $value) : $value),
             default => null,
         };
     }
@@ -480,6 +560,7 @@ final class JsonCrawler implements JsonCrawlerInterface
         $current = '';
         $inQuotes = false;
         $quoteChar = null;
+        $bracketDepth = 0;
 
         for ($i = 0; $i < \strlen($expr); ++$i) {
             $char = $expr[$i];
@@ -497,7 +578,11 @@ final class JsonCrawler implements JsonCrawlerInterface
                     $inQuotes = false;
                     $quoteChar = null;
                 }
-            } elseif (!$inQuotes && ',' === $char) {
+            } elseif (!$inQuotes && '[' === $char) {
+                ++$bracketDepth;
+            } elseif (!$inQuotes && ']' === $char) {
+                --$bracketDepth;
+            } elseif (!$inQuotes && 0 === $bracketDepth && ',' === $char) {
                 $parts[] = trim($current);
                 $current = '';
 
@@ -512,5 +597,53 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         return $parts;
+    }
+
+    /*
+     * Transform JSONPath regex patterns to comply with RFC 9535. The main issue is
+     * that '.' should not match \r or \n but should match Unicode line separators U+2028 and U+2029
+     */
+    private function transformJsonPathRegex(string $pattern): string
+    {
+        $result = '';
+        $inCharClass = false;
+        $escaped = false;
+        $length = strlen($pattern);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $pattern[$i];
+
+            if ($escaped) {
+                $result .= $char;
+                $escaped = false;
+                continue;
+            }
+
+            if ($char === '\\') {
+                $result .= $char;
+                $escaped = true;
+                continue;
+            }
+
+            if ($char === '[' && !$inCharClass) {
+                $inCharClass = true;
+                $result .= $char;
+                continue;
+            }
+
+            if ($char === ']' && $inCharClass) {
+                $inCharClass = false;
+                $result .= $char;
+                continue;
+            }
+
+            if ($char === '.' && !$inCharClass) {
+                $result .= '(?:[^\r\n]|\x{2028}|\x{2029})';
+            } else {
+                $result .= $char;
+            }
+        }
+
+        return $result;
     }
 }
