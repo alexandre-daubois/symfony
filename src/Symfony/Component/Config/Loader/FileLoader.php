@@ -69,7 +69,7 @@ abstract class FileLoader extends Loader
     {
         if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
             $excluded = [];
-            foreach ((array) $exclude as $pattern) {
+            foreach ((array) ($exclude ?? []) as $pattern) {
                 foreach ($this->glob($pattern, true, $_, false, true) as $path => $info) {
                     // normalize Windows slashes and remove trailing slashes
                     $excluded[rtrim(str_replace('\\', '/', $path), '/')] = true;

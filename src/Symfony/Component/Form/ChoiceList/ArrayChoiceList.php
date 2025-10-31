@@ -55,7 +55,7 @@ class ArrayChoiceList implements ChoiceListInterface
         }
 
         if (null === $value && $this->castableToString($choices)) {
-            $value = static fn ($choice) => false === $choice ? '0' : (string) $choice;
+            $value = static fn ($choice) => false === $choice ? '0' : (null === $choice ? '' : (string) $choice);
         }
 
         if (null !== $value) {
@@ -122,7 +122,8 @@ class ArrayChoiceList implements ChoiceListInterface
             $givenValues = [];
 
             foreach ($choices as $i => $givenChoice) {
-                $givenValues[$i] = (string) ($this->valueCallback)($givenChoice);
+                $callbackResult = ($this->valueCallback)($givenChoice);
+                $givenValues[$i] = null === $callbackResult ? '' : (string) $callbackResult;
             }
 
             return array_intersect($givenValues, array_keys($this->choices));
@@ -169,7 +170,8 @@ class ArrayChoiceList implements ChoiceListInterface
                 continue;
             }
 
-            $choiceValue = (string) $value($choice);
+            $valueResult = $value($choice);
+            $choiceValue = null === $valueResult ? '' : (string) $valueResult;
             $choicesByValues[$choiceValue] = $choice;
             $keysByValues[$choiceValue] = $key;
             $structuredValues[$key] = $choiceValue;

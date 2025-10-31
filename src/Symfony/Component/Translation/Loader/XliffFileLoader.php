@@ -112,10 +112,10 @@ class XliffFileLoader implements LoaderInterface
                     continue;
                 }
 
-                $source = (string) (isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source);
+                $source = (isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source) ?? '';
 
                 if (isset($translation->target)
-                    && 'needs-translation' === (string) $translation->target->attributes()['state']
+                    && 'needs-translation' === (string) ($translation->target->attributes() ?? '')['state']
                     && \in_array((string) $translation->target, [$source, (string) $translation->source], true)
                 ) {
                     continue;

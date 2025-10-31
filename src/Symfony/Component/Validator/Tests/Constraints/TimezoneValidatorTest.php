@@ -309,7 +309,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $reflector->info();
         $output = strip_tags(ob_get_clean());
         preg_match('/^ICU TZData version (?:=>)?(.*)$/m', $output, $matches);
-        $tzDbVersion = isset($matches[1]) ? (int) trim($matches[1]) : 0;
+        $tzDbVersion = isset($matches[1]) ? (int) filter_var(trim($matches[1]), \FILTER_SANITIZE_NUMBER_INT) : 0;
 
         if (!$tzDbVersion || 2017 <= $tzDbVersion) {
             $this->markTestSkipped('"Europe/Saratov" is expired until 2017, current version is '.$tzDbVersion);

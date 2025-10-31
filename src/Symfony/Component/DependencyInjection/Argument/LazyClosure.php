@@ -64,7 +64,7 @@ class LazyClosure
         }
 
         if (!$asClosure) {
-            $id = str_replace('%', '%%', (string) $id);
+            $id = str_replace('%', '%%', $id ?? '');
 
             if (!$r || !$r->isInterface()) {
                 throw new RuntimeException(\sprintf("Cannot create adapter{$id} because \"%s\" is not an interface.", $class));

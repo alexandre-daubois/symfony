@@ -315,7 +315,7 @@ class UploadedFileTest extends TestCase
 
         $this->assertGreaterThan(0, $size);
 
-        if (0 === (int) \ini_get('post_max_size') && 0 === (int) \ini_get('upload_max_filesize')) {
+        if (0 === (int) filter_var(\ini_get('post_max_size'), \FILTER_SANITIZE_NUMBER_INT) && 0 === (int) filter_var(\ini_get('upload_max_filesize'), \FILTER_SANITIZE_NUMBER_INT)) {
             $this->assertSame(\PHP_INT_MAX, $size);
         }
     }

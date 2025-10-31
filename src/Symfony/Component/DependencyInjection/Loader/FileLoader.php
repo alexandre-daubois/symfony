@@ -126,7 +126,7 @@ abstract class FileLoader extends BaseFileLoader
 
         $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();
         $autoconfigureAttributes = $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null;
-        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $source);
+        $classes = $this->findClasses($namespace, $resource, (array) ($exclude ?? []), $source);
 
         $getPrototype = static fn () => clone $prototype;
         $serialized = serialize($prototype);

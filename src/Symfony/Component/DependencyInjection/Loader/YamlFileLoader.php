@@ -867,7 +867,7 @@ class YamlFileLoader extends FileLoader
                         throw new InvalidArgumentException(\sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "%s".', $value->getTag(), implode('", "', $diff), implode('", "', $supportedKeys)));
                     }
 
-                    $argument = new TaggedIteratorArgument($argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null, $forLocator, $argument['default_priority_method'] ?? null, (array) ($argument['exclude'] ?? null), $argument['exclude_self'] ?? true);
+                    $argument = new TaggedIteratorArgument($argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null, $forLocator, $argument['default_priority_method'] ?? null, (array) ($argument['exclude'] ?? []), $argument['exclude_self'] ?? true);
                 } elseif (\is_string($argument) && $argument) {
                     $argument = new TaggedIteratorArgument($argument, null, null, $forLocator);
                 } else {

@@ -59,10 +59,10 @@ class ConstraintViolation implements ConstraintViolationInterface
         } elseif (\is_array($this->root)) {
             $class = 'Array';
         } else {
-            $class = (string) $this->root;
+            $class = $this->root ?? '';
         }
 
-        $propertyPath = (string) $this->propertyPath;
+        $propertyPath = (string) ($this->propertyPath ?? '');
 
         if ('' !== $propertyPath && '[' !== $propertyPath[0] && '' !== $class) {
             $class .= '.';
@@ -77,7 +77,7 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     public function getMessageTemplate(): string
     {
-        return (string) $this->messageTemplate;
+        return $this->messageTemplate ?? '';
     }
 
     public function getParameters(): array
@@ -102,7 +102,7 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     public function getPropertyPath(): string
     {
-        return (string) $this->propertyPath;
+        return (string) ($this->propertyPath ?? '');
     }
 
     public function getInvalidValue(): mixed

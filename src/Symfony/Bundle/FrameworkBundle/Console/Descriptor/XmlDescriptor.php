@@ -330,7 +330,7 @@ class XmlDescriptor extends Descriptor
             $serviceXML->setAttribute('id', $id);
         }
 
-        if ('' !== $classDescription = $this->getClassDescription((string) $definition->getClass())) {
+        if ('' !== $classDescription = $this->getClassDescription($definition->getClass() ?? '')) {
             $serviceXML->appendChild($descriptionXML = $dom->createElement('description'));
             $descriptionXML->appendChild($dom->createCDATASection($classDescription));
         }

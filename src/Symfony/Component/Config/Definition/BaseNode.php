@@ -51,7 +51,7 @@ abstract class BaseNode implements NodeInterface
         protected ?NodeInterface $parent = null,
         protected string $pathSeparator = self::DEFAULT_PATH_SEPARATOR,
     ) {
-        if (str_contains($name = (string) $name, $pathSeparator)) {
+        if (str_contains($name = $name ?? '', $pathSeparator)) {
             throw new \InvalidArgumentException('The name must not contain ".'.$pathSeparator.'".');
         }
 

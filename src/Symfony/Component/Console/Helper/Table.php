@@ -394,7 +394,7 @@ class Table
 
         $isHeader = !$horizontal;
         $isFirstRow = $horizontal;
-        $hasTitle = (bool) $this->headerTitle;
+        $hasTitle = null !== $this->headerTitle && '' !== $this->headerTitle;
 
         foreach ($rowGroups as $rowGroup) {
             $isHeaderSeparatorRendered = false;

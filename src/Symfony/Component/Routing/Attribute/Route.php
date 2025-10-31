@@ -69,9 +69,9 @@ class Route
         string|DeprecatedAlias|array $alias = [],
     ) {
         $this->path = $path;
-        $this->methods = (array) $methods;
-        $this->schemes = (array) $schemes;
-        $this->envs = (array) $env;
+        $this->methods = (array) ($methods ?? []);
+        $this->schemes = (array) ($schemes ?? []);
+        $this->envs = (array) ($env ?? []);
         $this->aliases = \is_array($alias) ? $alias : [$alias];
 
         if (null !== $locale) {

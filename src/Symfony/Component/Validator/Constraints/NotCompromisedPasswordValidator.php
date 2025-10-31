@@ -66,7 +66,7 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        $value = (string) $value;
+        $value = (string) ($value ?? '');
         if ('' === $value) {
             return;
         }

@@ -119,7 +119,7 @@ class ChoiceType extends AbstractType
                         throw new TransformationFailedException('Expected an array.');
                     }
 
-                    $data = (array) (string) $data;
+                    $data = (array) (null === $data ? '' : (string) $data);
                 }
 
                 // A map from submitted values to integers

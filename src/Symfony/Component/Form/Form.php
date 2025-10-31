@@ -976,7 +976,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // compound forms is passed to the data mapper and thus should
         // not be converted to a string before.
         if (!($transformers = $this->config->getViewTransformers()) && !$this->config->getCompound()) {
-            return null === $value || \is_scalar($value) ? (string) $value : $value;
+            return null === $value || \is_scalar($value) ? (null === $value ? '' : (string) $value) : $value;
         }
 
         try {

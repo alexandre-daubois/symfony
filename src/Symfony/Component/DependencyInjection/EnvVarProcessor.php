@@ -250,7 +250,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
         }
 
         if ('string' === $prefix) {
-            return (string) $env;
+            return null === $env ? '' : (string) $env;
         }
 
         if (\in_array($prefix, ['bool', 'not'], true)) {
@@ -264,7 +264,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
                 throw new RuntimeException(\sprintf('Non-numeric env var "%s" cannot be cast to int.', $name));
             }
 
-            return (int) $env;
+            return (int) ($env ?? 0);
         }
 
         if ('float' === $prefix) {
@@ -272,7 +272,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
                 throw new RuntimeException(\sprintf('Non-numeric env var "%s" cannot be cast to float.', $name));
             }
 
-            return (float) $env;
+            return (float) ($env ?? 0);
         }
 
         if ('const' === $prefix) {

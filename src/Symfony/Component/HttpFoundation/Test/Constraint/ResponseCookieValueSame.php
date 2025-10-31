@@ -48,7 +48,7 @@ final class ResponseCookieValueSame extends Constraint
             return false;
         }
 
-        return $this->value === (string) $cookie->getValue();
+        return $this->value === (string) ($cookie->getValue() ?? '');
     }
 
     /**

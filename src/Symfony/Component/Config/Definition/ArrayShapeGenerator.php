@@ -35,7 +35,7 @@ final class ArrayShapeGenerator
         }
 
         if ($node instanceof PrototypedArrayNode) {
-            $isHashmap = (bool) $node->getKeyAttribute();
+            $isHashmap = null !== $node->getKeyAttribute() && '' !== $node->getKeyAttribute();
             $arrayShape = ($isHashmap ? 'array<string, ' : 'list<').self::doGeneratePhpDoc($node->getPrototype(), 1 + $nestingLevel).'>';
 
             return implode('|', [...self::getNormalizedTypes($node, ['array', 'any']), $arrayShape]);
@@ -51,7 +51,7 @@ final class ArrayShapeGenerator
             $arrayShape .= str_repeat('    ', $nestingLevel).self::dumpNodeKey($child).': ';
 
             if ($child instanceof PrototypedArrayNode) {
-                $isHashmap = (bool) $child->getKeyAttribute();
+                $isHashmap = null !== $child->getKeyAttribute() && '' !== $child->getKeyAttribute();
                 $childArrayType = ($isHashmap ? 'array<string, ' : 'list<').self::doGeneratePhpDoc($child->getPrototype(), 1 + $nestingLevel).'>';
                 $arrayShape .= $child->hasDefaultValue() && null === $child->getDefaultValue() ? $childArrayType.'|null' : $childArrayType;
             } else {

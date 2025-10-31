@@ -79,7 +79,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new InvalidArgumentException(\sprintf('Class "%s" not found. Is the "data_class" form option set correctly?', $dataClass));
         }
 
-        $this->name = (string) $name;
+        $this->name = $name ?? '';
         $this->dataClass = $dataClass;
     }
 

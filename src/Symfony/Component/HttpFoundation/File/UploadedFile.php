@@ -249,7 +249,7 @@ class UploadedFile extends File
         } elseif (str_starts_with($max, '0')) {
             $max = \intval($max, 8);
         } else {
-            $max = (int) $max;
+            $max = (int) filter_var($max, \FILTER_SANITIZE_NUMBER_INT);
         }
 
         switch (substr($size, -1)) {

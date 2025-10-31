@@ -286,7 +286,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected function prepareForDenormalization(mixed $data): array
     {
-        return (array) $data;
+        return (array) ($data ?? []);
     }
 
     /**

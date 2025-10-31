@@ -36,7 +36,7 @@ abstract class AbstractPipes implements PipesInterface
         if (\is_resource($input) || $input instanceof \Iterator) {
             $this->input = $input;
         } else {
-            $this->inputBuffer = (string) $input;
+            $this->inputBuffer = (string) ($input ?? '');
         }
     }
 

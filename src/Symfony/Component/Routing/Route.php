@@ -137,7 +137,7 @@ class Route implements \Serializable
      */
     public function setHost(?string $pattern): static
     {
-        $this->host = $this->extractInlineDefaultsAndRequirements((string) $pattern);
+        $this->host = $this->extractInlineDefaultsAndRequirements($pattern ?? '');
         $this->compiled = null;
 
         return $this;
@@ -385,7 +385,7 @@ class Route implements \Serializable
      */
     public function setCondition(?string $condition): static
     {
-        $this->condition = (string) $condition;
+        $this->condition = $condition ?? '';
         $this->compiled = null;
 
         return $this;

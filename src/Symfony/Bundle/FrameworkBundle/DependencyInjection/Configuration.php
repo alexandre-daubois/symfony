@@ -148,7 +148,7 @@ class Configuration implements ConfigurationInterface
         ;
 
         $willBeAvailable = static function (string $package, string $class, ?string $parentPackage = null) {
-            $parentPackages = (array) $parentPackage;
+            $parentPackages = null === $parentPackage ? [] : (array) $parentPackage;
             $parentPackages[] = 'symfony/framework-bundle';
 
             return ContainerBuilder::willBeAvailable($package, $class, $parentPackages);

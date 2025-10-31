@@ -72,7 +72,7 @@ class FormConfigTest extends TestCase
 
         $formConfigBuilder = new FormConfigBuilder($name, null, new EventDispatcher());
 
-        $this->assertSame((string) $name, $formConfigBuilder->getName());
+        $this->assertSame($name ?? '', $formConfigBuilder->getName());
     }
 
     public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet()

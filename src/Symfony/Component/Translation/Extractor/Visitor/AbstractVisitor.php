@@ -52,7 +52,8 @@ abstract class AbstractVisitor
             return [];
         }
 
-        return (array) $this->getStringValue($arg->value);
+        $value = $this->getStringValue($arg->value);
+        return null === $value ? [] : (array) $value;
     }
 
     protected function hasNodeNamedArguments(Node\Expr\CallLike|Node\Attribute|Node\Expr\New_ $node): bool

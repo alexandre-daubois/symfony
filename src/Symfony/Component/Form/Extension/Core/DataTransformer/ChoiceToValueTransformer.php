@@ -38,7 +38,7 @@ class ChoiceToValueTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a string or null.');
         }
 
-        $choices = $this->choiceList->getChoicesForValues([(string) $value]);
+        $choices = $this->choiceList->getChoicesForValues([$value ?? '']);
 
         if (1 !== \count($choices)) {
             if (null === $value || '' === $value) {

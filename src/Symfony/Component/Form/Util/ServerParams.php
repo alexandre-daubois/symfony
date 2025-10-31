@@ -51,7 +51,8 @@ class ServerParams
         } elseif (str_starts_with($max, '0')) {
             $max = \intval($max, 8);
         } else {
-            $max = (int) $max;
+            $numericPart = filter_var($max, FILTER_SANITIZE_NUMBER_INT);
+            $max = (int) ($numericPart ?: 0);
         }
 
         switch (substr($iniMax, -1)) {

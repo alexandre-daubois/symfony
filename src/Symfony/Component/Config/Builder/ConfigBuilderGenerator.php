@@ -450,7 +450,7 @@ public function NAME($value): static
     private function getComment(BaseNode $node): string
     {
         $comment = '';
-        if ('' !== $info = (string) $node->getInfo()) {
+        if ('' !== $info = $node->getInfo() ?? '') {
             $comment .= $info."\n";
         }
 

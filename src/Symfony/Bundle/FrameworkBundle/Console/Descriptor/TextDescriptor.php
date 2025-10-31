@@ -321,7 +321,7 @@ class TextDescriptor extends Descriptor
             $options['output']->title(\sprintf('Information for Service "<info>%s</info>"', $options['id']));
         }
 
-        if ('' !== $classDescription = $this->getClassDescription((string) $definition->getClass())) {
+        if ('' !== $classDescription = $this->getClassDescription($definition->getClass() ?? '')) {
             $options['output']->text($classDescription."\n");
         }
 

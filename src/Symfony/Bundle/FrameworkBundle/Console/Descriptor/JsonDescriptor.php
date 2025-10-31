@@ -247,7 +247,7 @@ class JsonDescriptor extends Descriptor
     private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, ?ContainerBuilder $container = null, ?string $id = null): array
     {
         $data = [
-            'class' => (string) $definition->getClass(),
+            'class' => $definition->getClass() ?? '',
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
@@ -264,7 +264,7 @@ class JsonDescriptor extends Descriptor
             $data['deprecated'] = false;
         }
 
-        if ('' !== $classDescription = $this->getClassDescription((string) $definition->getClass())) {
+        if ('' !== $classDescription = $this->getClassDescription($definition->getClass() ?? '')) {
             $data['description'] = $classDescription;
         }
 

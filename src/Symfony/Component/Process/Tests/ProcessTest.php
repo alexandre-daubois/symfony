@@ -1472,7 +1472,7 @@ class ProcessTest extends TestCase
         $p = new Process([self::$phpBin, '-r', 'echo $argv[1];', $arg]);
         $p->run();
 
-        $this->assertSame((string) $arg, $p->getOutput());
+        $this->assertSame((string) ($arg ?? ''), $p->getOutput());
     }
 
     public function testRawCommandLine()

@@ -1393,7 +1393,7 @@ class Process implements \IteratorAggregate
      */
     private function validateTimeout(?float $timeout): ?float
     {
-        $timeout = (float) $timeout;
+        $timeout = (float) ($timeout ?? 0.0);
 
         if (0.0 === $timeout) {
             $timeout = null;

@@ -260,7 +260,7 @@ class Cookie
 
         $str .= '=';
 
-        if ('' === (string) $this->getValue()) {
+        if ('' === ($this->getValue() ?? '')) {
             $str .= 'deleted; expires='.gmdate('D, d M Y H:i:s T', time() - 31536001).'; Max-Age=0';
         } else {
             $str .= $this->isRaw() ? $this->getValue() : rawurlencode($this->getValue());
