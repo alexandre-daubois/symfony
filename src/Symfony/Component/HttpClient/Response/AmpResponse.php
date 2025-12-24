@@ -87,6 +87,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         $info['download_content_length'] = -1.0;
         $info['user_data'] = $options['user_data'];
         $info['max_duration'] = $options['max_duration'];
+        $info['max_connect_duration'] = $options['max_connect_duration'];
         $info['debug'] = '';
 
         $onProgress = $options['on_progress'] ?? static function () {};

@@ -483,6 +483,10 @@ class MockHttpClientTest extends HttpClientTestCase
                     ['error' => 'Max duration was reached.']
                 );
                 break;
+
+            case 'testMaxConnectDurationInfo':
+                $responses[] = new MockResponse('');
+                break;
         }
 
         return new MockHttpClient($responses);

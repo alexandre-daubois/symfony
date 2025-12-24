@@ -1156,6 +1156,17 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertLessThan(10, $duration);
     }
 
+    public function testMaxConnectDurationInfo()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/', [
+            'max_connect_duration' => 10.0,
+        ]);
+
+        $this->assertSame(10.0, $response->getInfo('max_connect_duration'));
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testWithOptions()
     {
         $client = $this->getHttpClient(__FUNCTION__);

@@ -128,7 +128,12 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
             $request->addHeader($h[0], $h[1]);
         }
 
-        $request->setTcpConnectTimeout($options['timeout']);
+        if (0 < $options['max_connect_duration']) {
+            $request->setTcpConnectTimeout($options['max_connect_duration']);
+        } else {
+            $request->setTcpConnectTimeout($options['timeout']);
+        }
+
         $request->setTlsHandshakeTimeout($options['timeout']);
         $request->setTransferTimeout($options['max_duration']);
         $request->setInactivityTimeout(0);

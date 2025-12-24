@@ -198,6 +198,10 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $options['headers'][] = 'User-Agent: Symfony HttpClient (Native)';
         }
 
+        if (0 < $options['max_connect_duration']) {
+            $options['timeout'] = min($options['max_connect_duration'], $options['timeout']);
+        }
+
         if (0 < $options['max_duration']) {
             $options['timeout'] = min($options['max_duration'], $options['timeout']);
         }
