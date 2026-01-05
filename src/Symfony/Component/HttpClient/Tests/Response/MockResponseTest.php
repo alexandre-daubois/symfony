@@ -81,17 +81,31 @@ class MockResponseTest extends TestCase
             'message' => 'Response body is empty.',
         ];
 
-        yield [
-            'content' => 'not json',
-            'responseHeaders' => [],
-            'message' => 'Syntax error for "https://example.com/file.json".',
-        ];
+        if (\PHP_VERSION_ID < 80600) {
+            yield [
+                'content' => 'not json',
+                'responseHeaders' => [],
+                'message' => 'Syntax error for "https://example.com/file.json".',
+            ];
 
-        yield [
-            'content' => '[1,2}',
-            'responseHeaders' => [],
-            'message' => 'State mismatch (invalid or malformed JSON) for "https://example.com/file.json".',
-        ];
+            yield [
+                'content' => '[1,2}',
+                'responseHeaders' => [],
+                'message' => 'State mismatch (invalid or malformed JSON) for "https://example.com/file.json".',
+            ];
+        } else {
+            yield [
+                'content' => 'not json',
+                'responseHeaders' => [],
+                'message' => 'Syntax error near location 1:1 for "https://example.com/file.json".',
+            ];
+
+            yield [
+                'content' => '[1,2}',
+                'responseHeaders' => [],
+                'message' => 'State mismatch (invalid or malformed JSON) near location 1:5 for "https://example.com/file.json".',
+            ];
+        }
 
         yield [
             'content' => '"not an array"',
