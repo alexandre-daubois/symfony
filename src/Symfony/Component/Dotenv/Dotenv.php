@@ -207,7 +207,8 @@ final class Dotenv
             }
 
             if ($this->usePutenv) {
-                putenv("$name=$value");
+                // "\0" is the placeholder for escaped "$" in raw values
+                putenv($name.'='.(str_contains($value, "\0") ? str_replace("\0", '$', $value) : $value));
             }
 
             $_ENV[$name] = $value;
